@@ -32,7 +32,7 @@
 			mmm external/openssh
 		fi
 		brunch cm_${goodevice}-userdebug
-		rom="$(ls -t1 out/target/product/${goodevice}/cm-10-*-UNOFFICIAL-${goodevice}.zip | head -n1)"
+		rom="$(ls -t1 out/target/product/${goodevice}/cm-10.1-*-UNOFFICIAL-${goodevice}.zip | head -n1)"
 		echo "-- ${rom} --> ${gootarget}/${goodevice}"
 		scp -P 2222 ${rom} M66B@upload.goo.im:${gootarget}/${goodevice}/
 	done

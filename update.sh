@@ -291,7 +291,6 @@ fi
 #Linaro
 if [ "${kernel_linaro}" = "Y" ]; then
 	echo "*** Kernel Linaro toolchain"
-	#cd ${android}/device/semc/msm7x30-common
 	for device in ${devices}
 	do
 		do_replace "arm-eabi-4.4.3" "${linaro_name}" ${android}/device/semc/${device}/BoardConfig.mk
