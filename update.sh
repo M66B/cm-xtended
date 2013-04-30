@@ -357,7 +357,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 			if [ "${kernel_ti_st}" ]; then
 				do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
-				do_replace "# CONFIG_ST_GPS is not set" "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		else
