@@ -53,7 +53,7 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 #bootimage
 
 kernel_mods=Y
-kernel_linaro=N
+kernel_linaro=Y
 kernel_fixes=Y
 kernel_underclock=Y
 kernel_hdmi=Y
@@ -292,7 +292,6 @@ fi
 if [ "${kernel_linaro}" = "Y" ]; then
 	echo "*** Kernel Linaro toolchain"
 	#cd ${android}/device/semc/msm7x30-common
-	#do_patch linaro.patch
 	for device in ${devices}
 	do
 		do_replace "arm-eabi-4.4.3" "${linaro_name}" ${android}/device/semc/${device}/BoardConfig.mk
@@ -342,11 +341,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_USB_OTG is not set" "CONFIG_USB_OTG=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_USB_OTG_WHITELIST is not set" "CONFIG_USB_OTG_WHITELIST=y" arch/arm/configs/nAa_${device}_defconfig
-
-			#if [ "${kernel_linaro}" = "Y" ]; then
-			#	do_replace "CONFIG_ARM_UNWIND=y" "# CONFIG_ARM_UNWIND is not set" arch/arm/configs/nAa_${device}_defconfig
-			#	do_append "CONFIG_FRAME_POINTER=y"  arch/arm/configs/nAa_${device}_defconfig
-			#fi
 		else
 			echo "--- No kernel config for ${device}"
 		fi
