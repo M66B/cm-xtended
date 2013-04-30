@@ -1,40 +1,24 @@
 diff --git a/res/values/strings.xml b/res/values/strings.xml
-index 5931dae..12b194b 100644
+index edde20f..292dc74 100644
 --- a/res/values/strings.xml
 +++ b/res/values/strings.xml
-@@ -2387,6 +2389,10 @@
-  from unknown sources. You agree that you are solely responsible for any
-  damage to your phone or loss of data that may result from using
-  these apps.</string>
+@@ -4378,4 +4378,63 @@
+     <string name="cell_broadcast_settings">Cell broadcasts</string>
+     <!-- Cell Broadcast settings description [CHAR LIMIT=100] -->
+     <string name="cell_broadcast_settings_summary">Select the types of emergency alerts to display.</string>
 +
++    <!-- Xtended: Pin code -->
 +    <string name="boot_pincode_title">Pincode at boot</string>
 +    <string name="boot_pincode_summary">Enter exactly four digits</string>
 +
-     <!-- Applications settings screen, setting check box title. If checked, applications show more settings options. -->
-     <string name="advanced_settings">Advanced settings</string>
-     <!-- Applications settings screen, setting check box summary.  This is the summary for "Advanced settings" checkbox  -->
-@@ -4674,6 +4680,12 @@
-     <string name="performance_settings_warning">These settings are included for experimentation and any changes made to them have the potential to cause instability, crashes, data loss or hardware failures.\n\nWe request you do not file bug reports if any of these settings have been changed from the defaults.</string>
- 
-     <!-- Performance Settings : Processor Settings -->
-+    <!-- Performance Settings : Categories -->
++    <!-- Xtended: Processor settings -->
 +    <string name="cpu_cat_current_title">Current</string>
 +    <string name="cpu_cat_general_title">General</string>
 +    <string name="cpu_cat_smartass_title">Smartass</string>
 +    <string name="cpu_cat_voltage_title">Voltage</string>
-+
-     <!-- Performance Settings : Processor settings title -->
-     <string name="processor_title">Processor</string>
-     <!-- Performance Settings : Processor settings summary. -->
-@@ -4688,7 +4700,35 @@
-     <string name="cpu_max_freq_title">Maximum CPU frequency</string>
-     <string name="cpu_max_freq_summary">%s</string>
-     <string name="cpu_set_on_boot">Set on boot</string>
--    <string name="cpu_set_on_boot_summary">Restore the processor settings on boot</string>
-+    <string name="cpu_set_on_boot_summary">Restore the general, smartass, and voltage processor settings on boot</string>
 +    <string name="cpu_set_on_boot_disabled">Set on boot disabled</string>
 +
-+    <!-- Performance Settings : Smartass -->
++    <!-- Xtended: Smartass settings -->
 +    <string name="smartass_awake_ideal_freq_title">Awake ideal frequency (awake_ideal_freq)</string>
 +    <string name="smartass_awake_ideal_freq_summary">%s\nThe frequency until which CPU is scaled up rapidly on screen-awake (from sleep). Thereafter, scaling up is less aggressive.</string>
 +    <string name="smartass_sleep_ideal_freq_title">Sleep ideal frequency (sleep_ideal_freq)</string>
@@ -58,29 +42,14 @@ index 5931dae..12b194b 100644
 +    <string name="smartass_boost_pulse_title">Boost pulse (boost_pulse)</string>
 +    <string name="smartass_boost_pulse_summary">%s\nCurrent boost pulse duration</string>
 +
-+    <!-- Performance Settings : Voltage -->
++    <!-- Xtended: Voltage -->
 +    <string name="voltage_warning">(use with care)</string>
- 
-     <!-- Performance Settings : I/O scheduler settings title -->
-     <string name="io_scheds_title">I/O scheduler</string>
-@@ -4698,6 +4738,8 @@
-     <!-- Performance Settings : I/O scheduler settings sub items -->
-     <string name="io_sched_title">I/O scheduler</string>
-     <string name="io_sched_summary">%S</string>
-+    <string name="fsync_title">fsync</string>
-+    <string name="fsync_summary">Synchronize a file\'s in-core state with storage device.\nDo not disable unless you know what you are doing!</string>
-     <string name="io_sched_set_on_boot">Set on boot</string>
-     <string name="io_sched_set_on_boot_summary">Restore the I/O scheduler settings on boot</string>
- 
-@@ -4713,6 +4755,26 @@
-     <!-- Purgeable Assets -->
-     <string name="pref_purgeable_assets_title">Allow purging of assets</string>
-     <string name="pref_purgeable_assets_summary">Purging of bitmap memory assets allows the freeing of more RAM when needed (requires reboot)</string>
-+    <!-- Autogroup -->
++
++    <!-- Xtended: Autogroup -->
 +    <string name="pref_autogroup_title">Autogroup</string>
 +    <string name="pref_autogroup_summary">Automated per tty (app) task groups. Always restored on boot.</string>
 +
-+    <!-- Lowmemkiller -->
++    <!-- Xtended: Lowmemkiller -->
 +    <string name="lowmem_foreground_app_title">Foreground app</string>
 +    <string name="lowmem_foreground_app_summary">%s\nThis is the process running the current foreground app. We\'d really rather not kill it!</string>
 +    <string name="lowmem_visible_app_title">Visible app</string>
@@ -96,25 +65,7 @@ index 5931dae..12b194b 100644
 +    <string name="lowmem_set_on_boot">Set on boot</string>
 +    <string name="lowmem_set_on_boot_summary">Restore the low memory settings on boot</string>
 +    <string name="lowmem_set_on_boot_disabled">Set on boot disabled</string>
- 
-     <!-- Performance Settings : Dithering -->
-     <string name="pref_use_dithering_title">Surface improvement</string>
-diff --git a/res/xml/ioscheduler_settings.xml b/res/xml/ioscheduler_settings.xml
-index e8eb267..b9e4dd3 100644
---- a/res/xml/ioscheduler_settings.xml
-+++ b/res/xml/ioscheduler_settings.xml
-@@ -25,6 +25,11 @@
-         android:title="@string/io_sched_title" />
- 
-     <CheckBoxPreference
-+        android:key="pref_fsync"
-+        android:title="@string/fsync_title"
-+        android:summary="@string/fsync_summary"/>
-+
-+    <CheckBoxPreference
-         android:key="pref_io_sched_set_on_boot"
-         android:title="@string/io_sched_set_on_boot"
-         android:summary="@string/io_sched_set_on_boot_summary"/>
+ </resources>
 diff --git a/res/xml/memory_management.xml b/res/xml/memory_management.xml
 index 187c815..1e14775 100644
 --- a/res/xml/memory_management.xml
@@ -294,83 +245,72 @@ index 7d0b0ee..ad267c7 100644
  
  </PreferenceScreen>
 diff --git a/res/xml/security_settings_misc.xml b/res/xml/security_settings_misc.xml
-index 9f78820..2df0a7e 100644
+index ee87e51..438016b 100644
 --- a/res/xml/security_settings_misc.xml
 +++ b/res/xml/security_settings_misc.xml
-@@ -52,6 +52,14 @@
-                 android:summaryOn="@string/install_unknown_applications"
+@@ -58,6 +58,14 @@
+                 android:summaryOff="@string/verify_applications_summary"
+                 android:summaryOn="@string/verify_applications_summary"
                  android:persistent="false" />
- 
-+        <EditTextPreference
-+            android:key="boot_pincode"
-+            android:dialogTitle="@string/boot_pincode_title"
-+            android:title="@string/boot_pincode_title"
-+            android:summary="@string/boot_pincode_summary"
-+            android:inputType="number"
-+            android:password="true" />
 +
++        <EditTextPreference
++                android:key="boot_pincode"
++                android:dialogTitle="@string/boot_pincode_title"
++                android:title="@string/boot_pincode_title"
++                android:summary="@string/boot_pincode_summary"
++                android:inputType="number"
++                android:password="true" />
      </PreferenceCategory>
  
-     <PreferenceCategory android:title="@string/credentials_title"
+     <PreferenceCategory android:key="credentials_management"
 diff --git a/src/com/android/settings/SecuritySettings.java b/src/com/android/settings/SecuritySettings.java
-index 47cbfe0..6df1237 100644
+index e124fa2..0430658 100644
 --- a/src/com/android/settings/SecuritySettings.java
 +++ b/src/com/android/settings/SecuritySettings.java
-@@ -32,6 +32,7 @@ import android.os.UserId;
- import android.os.Vibrator;
+@@ -35,6 +35,7 @@ import android.os.UserHandle;
+ import android.os.UserManager;
  import android.preference.CheckBoxPreference;
  import android.preference.ListPreference;
 +import android.preference.EditTextPreference;
  import android.preference.Preference;
  import android.preference.Preference.OnPreferenceChangeListener;
  import android.preference.PreferenceGroup;
-@@ -44,6 +45,7 @@ import android.util.Log;
- import com.android.internal.widget.LockPatternUtils;
+@@ -48,6 +49,7 @@ import com.android.internal.widget.LockPatternUtils;
  
  import java.util.ArrayList;
+ import java.util.List;
 +import java.io.File;
  
  /**
   * Gesture lock pattern settings.
-@@ -72,6 +74,7 @@ public class SecuritySettings extends SettingsPreferenceFragment
-     private static final String KEY_SHOW_PASSWORD = "show_password";
-     private static final String KEY_RESET_CREDENTIALS = "reset_credentials";
-     private static final String KEY_TOGGLE_INSTALL_APPLICATIONS = "toggle_install_applications";
+@@ -126,6 +128,11 @@ public class SecuritySettings extends SettingsPreferenceFragment
+     private CheckBoxPreference mQuickUnlockScreen;
+     private ListPreference mSmsSecurityCheck;
+ 
++    // Xtended
 +    public static final String KEY_BOOT_PINCODE = "boot_pincode";
-     private static final String KEY_POWER_INSTANTLY_LOCKS = "power_button_instantly_locks";
-     private static final String SLIDE_LOCK_DELAY_TOGGLE = "slide_lock_delay_toggle";
-     private static final String SLIDE_LOCK_TIMEOUT_DELAY = "slide_lock_timeout_delay";
-@@ -83,6 +86,8 @@ public class SecuritySettings extends SettingsPreferenceFragment
-     private static final String KEY_SMS_SECURITY_CHECK_PREF = "sms_security_check_limit";
-     public static final String KEY_VIBRATE_PREF = "lockscreen_vibrate";
- 
 +    public static final String BOOT_PINCODE_FILE = "/cache/pin/code";
-+
-     DevicePolicyManager mDPM;
- 
-     private ChooseLockSettingsHelper mChooseLockSettingsHelper;
-@@ -108,6 +113,7 @@ public class SecuritySettings extends SettingsPreferenceFragment
-     private Preference mResetCredentials;
- 
-     private CheckBoxPreference mToggleAppInstallation;
 +    private EditTextPreference mBootPincode;
-     private DialogInterface mWarnInstallApps;
-     private CheckBoxPreference mPowerButtonInstantlyLocks;
- 
-@@ -359,6 +365,9 @@ public class SecuritySettings extends SettingsPreferenceFragment
-             mToggleAppInstallation = (CheckBoxPreference) findPreference(
-                     KEY_TOGGLE_INSTALL_APPLICATIONS);
-             mToggleAppInstallation.setChecked(isNonMarketAppsAllowed());
++
+     @Override
+     public void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+@@ -401,6 +408,11 @@ public class SecuritySettings extends SettingsPreferenceFragment
+                 int smsSecurityCheck = Integer.valueOf(mSmsSecurityCheck.getValue());
+                 updateSmsSecuritySummary(smsSecurityCheck);
+             }
++
++            // Xtended
 +            mBootPincode = (EditTextPreference) findPreference(
 +                    KEY_BOOT_PINCODE);
 +            mBootPincode.setOnPreferenceChangeListener(this);
-         }
+          }
  
-         boolean isTelephony = pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
-@@ -702,6 +711,14 @@ public class SecuritySettings extends SettingsPreferenceFragment
-             Settings.Secure.putInt(getContentResolver(), Settings.Secure.SMS_OUTGOING_CHECK_MAX_COUNT,
-                      smsSecurityCheck);
-             updateSmsSecuritySummary(smsSecurityCheck);
+         return root;
+@@ -691,6 +703,14 @@ public class SecuritySettings extends SettingsPreferenceFragment
+         } else if (KEY_TOGGLE_VERIFY_APPLICATIONS.equals(key)) {
+             Settings.Global.putInt(getContentResolver(), Settings.Global.PACKAGE_VERIFIER_ENABLE,
+                     mToggleVerifyApps.isChecked() ? 1 : 0);
 +        } else if (preference == mBootPincode) {
 +            String pincode = (String)value;
 +            if (pincode != null && pincode.length() == 4)
@@ -379,14 +319,14 @@ index 47cbfe0..6df1237 100644
 +                File pfile = new File(SecuritySettings.BOOT_PINCODE_FILE);
 +                pfile.delete();
 +            }
-         }
-         return true;
-     }
+         } else {
+             // If we didn't handle it, let preferences handle it.
+             return super.onPreferenceTreeClick(preferenceScreen, preference);
 diff --git a/src/com/android/settings/cyanogenmod/BootReceiver.java b/src/com/android/settings/cyanogenmod/BootReceiver.java
-index 0704a66..8f71904 100644
+index 4311168..1ddc9de 100644
 --- a/src/com/android/settings/cyanogenmod/BootReceiver.java
 +++ b/src/com/android/settings/cyanogenmod/BootReceiver.java
-@@ -22,12 +22,20 @@ import android.content.Intent;
+@@ -22,13 +22,21 @@ import android.content.Intent;
  import android.content.SharedPreferences;
  import android.os.SystemProperties;
  import android.preference.PreferenceManager;
@@ -394,6 +334,7 @@ index 0704a66..8f71904 100644
 +import android.provider.Settings.SettingNotFoundException;
  import android.util.Log;
  
+ import com.android.settings.R;
  import com.android.settings.Utils;
 +import com.android.settings.SecuritySettings;
 +
@@ -407,7 +348,7 @@ index 0704a66..8f71904 100644
  
  public class BootReceiver extends BroadcastReceiver {
  
-@@ -36,6 +44,7 @@ public class BootReceiver extends BroadcastReceiver {
+@@ -37,6 +45,7 @@ public class BootReceiver extends BroadcastReceiver {
      private static final String CPU_SETTINGS_PROP = "sys.cpufreq.restored";
      private static final String IOSCHED_SETTINGS_PROP = "sys.iosched.restored";
      private static final String KSM_SETTINGS_PROP = "sys.ksm.restored";
@@ -415,7 +356,7 @@ index 0704a66..8f71904 100644
  
      @Override
      public void onReceive(Context ctx, Intent intent) {
-@@ -64,45 +73,155 @@ public class BootReceiver extends BroadcastReceiver {
+@@ -65,6 +74,24 @@ public class BootReceiver extends BroadcastReceiver {
                  SystemProperties.set(KSM_SETTINGS_PROP, "false");
              }
          }
@@ -439,7 +380,8 @@ index 0704a66..8f71904 100644
 +        }
      }
  
-     private void configureCPU(Context ctx) {
+     private void initFreqCapFiles(Context ctx)
+@@ -79,40 +106,132 @@ public class BootReceiver extends BroadcastReceiver {
          SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
  
          if (prefs.getBoolean(Processor.SOB_PREF, false) == false) {
@@ -471,28 +413,27 @@ index 0704a66..8f71904 100644
 -        if (noSettings) {
 -            Log.d(TAG, "No CPU settings saved. Nothing to restore.");
 -        } else {
+-            initFreqCapFiles(ctx);
 -            if (availableGovernorsLine != null){
 -                governors = Arrays.asList(availableGovernorsLine.split(" "));
 -            }
 -            if (availableFrequenciesLine != null){
 -                frequencies = Arrays.asList(availableFrequenciesLine.split(" "));
 -            }
--            if (governor != null && governors != null && governors.contains(governor)) {
--                Utils.fileWriteOneLine(Processor.GOV_FILE, governor);
--            }
 -            if (maxFrequency != null && frequencies != null && frequencies.contains(maxFrequency)) {
 -                Utils.fileWriteOneLine(Processor.FREQ_MAX_FILE, maxFrequency);
+-            }
+-            if (minFrequency != null && frequencies != null && frequencies.contains(minFrequency)) {
+-                Utils.fileWriteOneLine(Processor.FREQ_MIN_FILE, minFrequency);
 +            if (noSettings) {
 +                Log.d(TAG, "No CPU settings saved. Nothing to restore.");
 +            } else {
++                initFreqCapFiles(ctx);
 +                if (availableGovernorsLine != null){
 +                    governors = Arrays.asList(availableGovernorsLine.split(" "));
 +                }
 +                if (availableFrequenciesLine != null){
 +                    frequencies = Arrays.asList(availableFrequenciesLine.split(" "));
-+                }
-+                if (governor != null && governors != null && governors.contains(governor)) {
-+                    Utils.fileWriteOneLine(Processor.GOV_FILE, governor);
 +                }
 +                if (maxFrequency != null && frequencies != null && frequencies.contains(maxFrequency)) {
 +                    Utils.fileWriteOneLine(Processor.FREQ_MAX_FILE, maxFrequency);
@@ -500,10 +441,13 @@ index 0704a66..8f71904 100644
 +                if (minFrequency != null && frequencies != null && frequencies.contains(minFrequency)) {
 +                    Utils.fileWriteOneLine(Processor.FREQ_MIN_FILE, minFrequency);
 +                }
++                if (governor != null && governors != null && governors.contains(governor)) {
++                    Utils.fileWriteOneLine(Processor.GOV_FILE, governor);
++                }
 +                Log.d(TAG, "CPU settings restored.");
              }
--            if (minFrequency != null && frequencies != null && frequencies.contains(minFrequency)) {
--                Utils.fileWriteOneLine(Processor.FREQ_MIN_FILE, minFrequency);
+-            if (governor != null && governors != null && governors.contains(governor)) {
+-                Utils.fileWriteOneLine(Processor.GOV_FILE, governor);
 +        }
 +        catch (Exception e) {
 +            e.printStackTrace();
@@ -598,7 +542,7 @@ index 0704a66..8f71904 100644
          }
      }
  
-@@ -114,21 +233,40 @@ public class BootReceiver extends BroadcastReceiver {
+@@ -124,21 +243,26 @@ public class BootReceiver extends BroadcastReceiver {
              return;
          }
  
@@ -606,7 +550,6 @@ index 0704a66..8f71904 100644
 -        String availableIOSchedulersLine = Utils.fileReadOneLine(IOScheduler.IOSCHED_LIST_FILE);
 -        boolean noSettings = ((availableIOSchedulersLine == null) || (ioscheduler == null));
 -        List<String> ioschedulers = null;
-+        // I/O scheduler
 +        try {
 +            String ioscheduler = prefs.getString(IOScheduler.IOSCHED_PREF, null);
 +            String availableIOSchedulersLine = Utils.fileReadOneLine(IOScheduler.IOSCHED_LIST_FILE);
@@ -618,6 +561,9 @@ index 0704a66..8f71904 100644
 -        } else {
 -            if (availableIOSchedulersLine != null){
 -                ioschedulers = Arrays.asList(availableIOSchedulersLine.replace("[", "").replace("]", "").split(" "));
+-            }
+-            if (ioscheduler != null && ioschedulers != null && ioschedulers.contains(ioscheduler)) {
+-                Utils.fileWriteOneLine(IOScheduler.IOSCHED_LIST_FILE, ioscheduler);
 +            if (noSettings) {
 +                Log.d(TAG, "No I/O scheduler settings saved. Nothing to restore.");
 +            } else {
@@ -629,21 +575,6 @@ index 0704a66..8f71904 100644
 +                }
 +                Log.d(TAG, "I/O scheduler settings restored.");
              }
--            if (ioscheduler != null && ioschedulers != null && ioschedulers.contains(ioscheduler)) {
--                Utils.fileWriteOneLine(IOScheduler.IOSCHED_LIST_FILE, ioscheduler);
-+        }
-+        catch (Exception e) {
-+            e.printStackTrace();
-+        }
-+
-+        // fsync
-+        try {
-+            if (Utils.fileExists(IOScheduler.FSYNC_FILE)) {
-+                String fsync = (prefs.getBoolean(IOScheduler.FSYNC_PREF, true) ? "Y" : "N");
-+                Log.d(TAG, "fsync=" + fsync);
-+                Utils.fileWriteOneLine(IOScheduler.FSYNC_FILE, fsync);
-+                Log.d(TAG, "fsync restored.");
-             }
 -            Log.d(TAG, "I/O scheduler settings restored.");
 +        }
 +        catch (Exception e) {
@@ -651,7 +582,7 @@ index 0704a66..8f71904 100644
          }
      }
  
-@@ -140,4 +278,51 @@ public class BootReceiver extends BroadcastReceiver {
+@@ -150,4 +274,51 @@ public class BootReceiver extends BroadcastReceiver {
          Utils.fileWriteOneLine(MemoryManagement.KSM_RUN_FILE, ksm ? "1" : "0");
          Log.d(TAG, "KSM settings restored.");
      }
@@ -1011,7 +942,7 @@ index 8626b06..8f41b7c 100644
 +    }
  }
 diff --git a/src/com/android/settings/cyanogenmod/Processor.java b/src/com/android/settings/cyanogenmod/Processor.java
-index ce2c404..cba6285 100644
+index 6f21e30..f72bbeb 100644
 --- a/src/com/android/settings/cyanogenmod/Processor.java
 +++ b/src/com/android/settings/cyanogenmod/Processor.java
 @@ -22,11 +22,22 @@ import android.os.Message;
@@ -1037,8 +968,8 @@ index ce2c404..cba6285 100644
  //
  // CPU Related Settings
  //
-@@ -47,16 +58,102 @@ public class Processor extends SettingsPreferenceFragment implements
-     public static final String FREQ_MIN_FILE = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq";
+@@ -47,6 +58,65 @@ public class Processor extends SettingsPreferenceFragment implements
+     public static String FREQ_MIN_FILE = null;
      public static final String SOB_PREF = "pref_cpu_set_on_boot";
  
 +    public static final String SMARTASS_AWAKE_IDEAL_FREQ_PREF = "pref_smartass_awake_ideal_freq";
@@ -1100,9 +1031,10 @@ index ce2c404..cba6285 100644
 +        put("1612800", "1300");
 +    }};
 +
-     private static final String TAG = "CPUSettings";
+     protected static boolean freqCapFilesInitialized = false;
  
-     private String mGovernorFormat;
+     private static final String TAG = "CPUSettings";
+@@ -55,10 +125,37 @@ public class Processor extends SettingsPreferenceFragment implements
      private String mMinFrequencyFormat;
      private String mMaxFrequencyFormat;
  
@@ -1140,17 +1072,17 @@ index ce2c404..cba6285 100644
  
      private class CurCPUThread extends Thread {
          private boolean mInterrupt = false;
-@@ -70,9 +167,17 @@ public class Processor extends SettingsPreferenceFragment implements
+@@ -72,9 +169,16 @@ public class Processor extends SettingsPreferenceFragment implements
              try {
                  while (!mInterrupt) {
                      sleep(500);
 -                    final String curFreq = Utils.fileReadOneLine(FREQ_CUR_FILE);
-+
+-                    if (curFreq != null)
+-                        mCurCPUHandler.sendMessage(mCurCPUHandler.obtainMessage(0, curFreq));
 +                    final String curFreq = (Utils.fileExists(FREQ_CUR_FILE)
 +                        ? Utils.fileReadOneLine(FREQ_CUR_FILE)
 +                        : null);
-                     if (curFreq != null)
--                        mCurCPUHandler.sendMessage(mCurCPUHandler.obtainMessage(0, curFreq));
++                     if (curFreq != null)
 +                        mCurCPUHandler.sendMessage(mCurCPUHandler.obtainMessage(what_cur_freq, curFreq));
 +
 +                    final String fileBoost = String.format(SMARTASS_BOOST_PULSE_FILE, getSmartass());
@@ -1160,7 +1092,7 @@ index ce2c404..cba6285 100644
                  }
              } catch (InterruptedException e) {
              }
-@@ -83,7 +188,11 @@ public class Processor extends SettingsPreferenceFragment implements
+@@ -85,7 +189,11 @@ public class Processor extends SettingsPreferenceFragment implements
  
      private Handler mCurCPUHandler = new Handler() {
          public void handleMessage(Message msg) {
@@ -1173,7 +1105,7 @@ index ce2c404..cba6285 100644
          }
      };
  
-@@ -95,6 +204,18 @@ public class Processor extends SettingsPreferenceFragment implements
+@@ -107,6 +215,18 @@ public class Processor extends SettingsPreferenceFragment implements
          mMinFrequencyFormat = getString(R.string.cpu_min_freq_summary);
          mMaxFrequencyFormat = getString(R.string.cpu_max_freq_summary);
  
@@ -1192,7 +1124,7 @@ index ce2c404..cba6285 100644
          String[] availableFrequencies = new String[0];
          String[] availableGovernors = new String[0];
          String[] frequencies;
-@@ -110,6 +231,66 @@ public class Processor extends SettingsPreferenceFragment implements
+@@ -122,6 +242,66 @@ public class Processor extends SettingsPreferenceFragment implements
          mCurFrequencyPref = (Preference) prefScreen.findPreference(FREQ_CUR_PREF);
          mMinFrequencyPref = (ListPreference) prefScreen.findPreference(FREQ_MIN_PREF);
          mMaxFrequencyPref = (ListPreference) prefScreen.findPreference(FREQ_MAX_PREF);
@@ -1259,17 +1191,19 @@ index ce2c404..cba6285 100644
  
          /* Governor
          Some systems might not use governors */
-@@ -174,8 +355,187 @@ public class Processor extends SettingsPreferenceFragment implements
+@@ -186,11 +366,190 @@ public class Processor extends SettingsPreferenceFragment implements
  
          } else {
              mCurFrequencyPref.setSummary(toMHz(temp));
-+        }
+-
+-            mCurCPUThread.start();
+         }
 +
 +        setSmartassValues(null);
 +
 +        mCurCPUThread.start();
-+    }
-+
+     }
+ 
 +    private void setSmartassValues(Preference preference) {
 +        String[] availableFrequencies = new String[0];
 +        String[] frequencies;
@@ -1365,8 +1299,7 @@ index ce2c404..cba6285 100644
 +                mSmartassMinCpuLoadPref.setOnPreferenceChangeListener(this);
 +            }
 +        }
- 
--            mCurCPUThread.start();
++
 +        // Ramp up step
 +        if (preference == null || preference == mSmartassRampUpStepPref) {
 +            String file = String.format(SMARTASS_RAMP_UP_STEP_FILE, getSmartass());
@@ -1445,10 +1378,13 @@ index ce2c404..cba6285 100644
 +                mSmartassBoostPulsePref.setEnabled(true);
 +                mSmartassBoostPulsePref.setSummary(String.format(mSmartassBoostPulseFormat, toMs(temp)));
 +            }
-         }
-     }
- 
-@@ -196,8 +556,37 @@ public class Processor extends SettingsPreferenceFragment implements
++         }
++     }
++
+     @Override
+     public void onResume() {
+         String temp;
+@@ -210,8 +569,37 @@ public class Processor extends SettingsPreferenceFragment implements
          }
  
          if (Utils.fileExists(GOV_FILE) && (temp = Utils.fileReadOneLine(GOV_FILE)) != null) {
@@ -1486,10 +1422,10 @@ index ce2c404..cba6285 100644
      }
  
      @Override
-@@ -211,27 +600,78 @@ public class Processor extends SettingsPreferenceFragment implements
-     }
- 
+@@ -227,26 +615,76 @@ public class Processor extends SettingsPreferenceFragment implements
      public boolean onPreferenceChange(Preference preference, Object newValue) {
+         initFreqCapFiles();
+ 
 -        String fname = "";
 +        String fname = null;
 +        String mv = null;
@@ -1559,15 +1495,13 @@ index ce2c404..cba6285 100644
 +                } else if (preference.getKey().startsWith(VDD_LEVELS_PREF)) {
 +                    String freq = preference.getKey().substring(VDD_LEVELS_PREF.length());
 +                    preference.setSummary(String.format("%s mV (default %s mV)", mv, mvDefault.get(freq)));
-                 }
++                }
 +                else {
 +                    setSmartassValues(preference);
-+                }
-+
+                 }
                  return true;
              } else {
-                 return false;
-@@ -240,8 +680,42 @@ public class Processor extends SettingsPreferenceFragment implements
+@@ -256,8 +694,42 @@ public class Processor extends SettingsPreferenceFragment implements
          return false;
      }
  
