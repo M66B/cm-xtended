@@ -46,9 +46,9 @@ fi
 
 #Linaro
 
-linaro_name=arm-eabi-4.8-linaro
-linaro_file=gcc-linaro-4.8-2013.04.tar.bz2
-linaro_url=https://launchpad.net/gcc-linaro/4.8/4.8-2013.04/+download/${linaro_file}
+linaro_name=arm-eabi-4.7-linaro
+linaro_file=android-toolchain-eabi-4.7-daily-linux-x86.tar.bz2
+linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-android_toolchain-4.7-bzr/lastSuccessfulBuild/artifact/build/out/${linaro_file}
 
 #bootimage
 
