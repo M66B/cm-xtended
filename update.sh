@@ -310,7 +310,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 	if [ "${kernel_fixes}" = "Y" ]; then
 		do_patch kernel_fixes.patch
-		do_patch kernel_cifs.patch
 	fi
 
 	if [ "${kernel_underclock}" = "Y" ]; then
