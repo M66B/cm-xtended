@@ -1,0 +1,79 @@
+diff -Npru --exclude='.git*' CM10.1/build/core/pathmap.mk pang/build/core/pathmap.mk
+--- CM10.1/build/core/pathmap.mk	2012-07-13 08:59:33.472884054 -0700
++++ pang/build/core/pathmap.mk	2012-07-13 10:18:29.349669133 -0700
+@@ -84,6 +84,7 @@ JNI_H_INCLUDE := $(call include-path-for
+ # is so common and the other framework libraries can have mutual
+ # interdependencies.
+ #
++# BEGIN privacy-added: privacy
+ FRAMEWORKS_BASE_SUBDIRS := \
+ 	$(addsuffix /java, \
+ 	    core \
+@@ -95,6 +96,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
+ 	    media/mca/filterpacks \
+ 	    drm \
+ 	    opengl \
++	    privacy \
+ 	    sax \
+ 	    telephony \
+ 	    wifi \
+@@ -102,6 +104,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
+ 	    icu4j \
+ 	    voip \
+ 	 )
++# END privacy-added: privacy
+ 
+ #
+ # A version of FRAMEWORKS_BASE_SUBDIRS that is expanded to full paths from
+--- CM10.1_ORIG/build/target/product/core.mk	2013-02-08 18:28:09.441660294 +0545
++++ pang/build/target/product/core.mk	2013-01-16 01:12:45.258540952 +0545
+@@ -18,6 +18,7 @@ PRODUCT_BRAND := generic
+ PRODUCT_DEVICE := generic
+ PRODUCT_NAME := core
+ 
++# BEGIN privacy-added: PDroid
+ PRODUCT_PACKAGES += \
+     ApplicationsProvider \
+     BackupRestoreConfirmation \
+@@ -32,6 +33,7 @@ PRODUCT_PACKAGES += \
+     Home \
+     KeyChain \
+     MediaProvider \
++    PDroid \
+     PackageInstaller \
+     PhotoTable \
+     PicoTts \
+@@ -130,6 +132,8 @@ PRODUCT_PACKAGES += \
+     zoneinfo.idx \
+     zoneinfo.version
+ 
++# END privacy-added: PDroid
++
+ PRODUCT_COPY_FILES += \
+     system/core/rootdir/init.usb.rc:root/init.usb.rc \
+     system/core/rootdir/init.trace.rc:root/init.trace.rc \
+Binary files CM10/build/target/product/security/privacy.pk8 and pang/build/target/product/security/privacy.pk8 differ
+diff -Npru --exclude='.git*' CM10.1/build/target/product/security/privacy.x509.pem pang/build/target/product/security/privacy.x509.pem
+--- CM10.1/build/target/product/security/privacy.x509.pem	1969-12-31 16:00:00.000000000 -0800
++++ pang/build/target/product/security/privacy.x509.pem	2012-07-13 10:18:29.356671097 -0700
+@@ -0,0 +1,20 @@
++-----BEGIN CERTIFICATE-----
++MIIDNDCCAhwCCQCXWkdOAj3rWTANBgkqhkiG9w0BAQUFADBcMQswCQYDVQQGEwJE
++RTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0
++cyBQdHkgTHRkMRUwEwYDVQQDEwxTdnlhdG9zbGF2IEgwHhcNMTEwNzE0MjEyNTI2
++WhcNMzgxMTI4MjEyNTI2WjBcMQswCQYDVQQGEwJERTETMBEGA1UECBMKU29tZS1T
++dGF0ZTEhMB8GA1UEChMYSW50ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMRUwEwYDVQQD
++EwxTdnlhdG9zbGF2IEgwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDb
++i4kL71TqNRi0F5RjDVejPlnN1aiFtruvWiuvppcPjY9SNw6WaTfJS356yWBrorU6
++qZbqS0l5vl+CcMrm94F2gbTZamsHaUz7puGMLx3R/s3vvYSD8pPwzqhyLY+mSSK+
++cbhvthJMa4FJLFyHKlHj7l1wn8qeAr2ceKVF4w5SjwGl9hwSHA68TMeb9dWO87N7
++82p+D9fqU3I33Qf0ieiBiRYrEBHQtDwCMJNktNmmG9GyKyu8PVs2jhvJkNsga/Le
++y+0FPwRgKA0MgnKavliGxST76Sl98pimc9h+ZyedwXw2z+lk1Fh+qhuDBWaTgIJl
++C+yLqa+TAYqimUdUYSuvAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAHI5T9gdsFh1
++X4g7eQVXBEyW11mpsqUh/Kl4PI/8xSzeon9DQcNc+oQJDAvtOoQXww1sYKUykmwr
++H7idjx6fMyygeUsvRy7clDBfdG+GR43QPkJSZT61ZGhZUbKKOPoAMnomNe2uL4LW
++4iU/1bkEQNKzV0iea663t3t5rr++lE2Ulm0LIDLgxlmuyvl/6e8kgRk/ojj/ZhIh
++IjEZjWwAJDRxGz7Kc19keecUtIE/fBZrkC+qRivnfqEuXH/MW7a18uYYtG25yFQp
++UJHQ0wBayhY9NKkcgVAABMdiNtKJIXdrkeKBKDSnuX7GErwy23adjZ5wFjxefm7P
++jjazBHHW1qc=
++-----END CERTIFICATE-----

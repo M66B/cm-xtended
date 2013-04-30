@@ -1,0 +1,126 @@
+diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.mk~' '--exclude=*.orig~' '--exclude=*.txt' '--exclude=*.orig' '--exclude=*.rej' '--exclude=*.latest' '--exclude=*.txt~' '--exclude=*.xml~' '--exclude=*xml.orig~' '--exclude=*.xml.orig' /root/CM10.1_ORIG/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java pang/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java
+--- /root/CM10.1_ORIG/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java	2013-02-08 18:29:51.929101208 +0545
++++ pang/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java	2013-02-05 01:07:08.738642570 +0545
+@@ -46,6 +46,24 @@ import android.util.Log;
+ import com.android.mms.LogTag;
+ import com.android.mms.MmsConfig;
+ 
++
++//-------------------------------------------------
++import com.android.internal.telephony.Phone;
++import android.net.Uri;
++import android.database.Cursor;
++import android.os.ServiceManager;
++import android.privacy.IPrivacySettingsManager;
++import android.privacy.PrivacySettingsManager;
++import android.privacy.PrivacySettings;
++import android.privacy.utilities.PrivacyDebugger;
++import android.provider.Telephony;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++import com.android.internal.telephony.PhoneConstants;
++//-------------------------------------------------
++
++
+ public class HttpUtils {
+     private static final String TAG = LogTag.TRANSACTION;
+ 
+@@ -62,7 +80,56 @@ public class HttpUtils {
+     // setting, this should no longer be static.  We should call
+     // getHttpAcceptLanguage instead.
+     private static final String HDR_VALUE_ACCEPT_LANGUAGE;
++    
++    
++    //-------------------------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------------------
++    private static PrivacySettingsManager pSetMan;
++  	
++    private static class APNInfo{
++    	public String MMSCenterUrl;
++        public String MMSPort;
++        public String MMSProxy;
++        
++        public APNInfo(){
++        	//init to prevent nullpointer exception
++        	MMSCenterUrl = "";
++        	MMSPort = "";
++        	MMSProxy = "";
++        }
++    }
++    
++    private static List<APNInfo> getAPN(Context context){
++    	 final Cursor apnCursor = context.getContentResolver().query(Uri.withAppendedPath(Telephony.Carriers.CONTENT_URI, "current"), null, null, null, null);
++    	 if (apnCursor == null) {
++    	         return Collections.emptyList();
++	     } else {
++	         final List<APNInfo> results = new ArrayList<APNInfo>(); 
++	         if (apnCursor.moveToFirst()) {
++    	         do{
++    	             final String type = apnCursor.getString(apnCursor.getColumnIndex(Telephony.Carriers.TYPE));
++    	             if (!TextUtils.isEmpty(type) && ( type.equalsIgnoreCase(PhoneConstants.APN_TYPE_ALL) || type.equalsIgnoreCase(PhoneConstants.APN_TYPE_MMS))) {
++    	                 final String mmsc = apnCursor.getString(apnCursor.getColumnIndex(Telephony.Carriers.MMSC));
++    	                 final String mmsProxy = apnCursor.getString(apnCursor.getColumnIndex(Telephony.Carriers.MMSPROXY));
++    	                 final String port = apnCursor.getString(apnCursor.getColumnIndex(Telephony.Carriers.MMSPORT));                  
++    	                 final APNInfo apn = new APNInfo();
++    	                 apn.MMSCenterUrl = mmsc;
++    	                 apn.MMSProxy = mmsProxy;
++    	                 apn.MMSPort = port;
++    	                 results.add(apn);
++    	             }
++    	         } while (apnCursor.moveToNext()); 
++	         }              
++	         apnCursor.close();
++	         PrivacyDebugger.i(TAG,"getApn - number of results: " + results.size());
++	         return results;
++	     }
++    }
++    
++    
++    //-------------------------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------------------
+ 
++    
++    
+     static {
+         HDR_VALUE_ACCEPT_LANGUAGE = getCurrentAcceptLanguage(Locale.getDefault());
+     }
+@@ -113,7 +180,39 @@ public class HttpUtils {
+         }
+ 
+         AndroidHttpClient client = null;
+-
++        
++        //-------------------------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------
++    	if(pSetMan == null) pSetMan = new PrivacySettingsManager(context, IPrivacySettingsManager.Stub.asInterface(ServiceManager.getService("privacy")));
++    	final List<APNInfo> apn = getAPN(context);
++    	boolean isMMSTransaction = false;
++    	APNInfo tmp;
++    	for(int i = 0; i < apn.size(); i++){
++    		tmp = apn.get(i);
++    		if(tmp.MMSProxy.equals(proxyHost) || tmp.MMSPort.equals(String.valueOf(proxyPort)) || tmp.MMSCenterUrl.equals(url)){
++    			isMMSTransaction = true;
++    			PrivacyDebugger.i(TAG,"httpConnection - found mms transaction");
++    			break;
++    		}
++    	}
++    	if(isMMSTransaction){
++	    	PrivacySettings settings = pSetMan.getSettings(context.getPackageName());
++	    	if(settings != null && settings.getSendMmsSetting() != PrivacySettings.REAL) {
++	    		if(settings.isDefaultDenyObject())
++	    			pSetMan.notification(context.getPackageName(), 0, PrivacySettings.ERROR, PrivacySettings.DATA_SEND_MMS, null, null);
++	    		else
++	    			pSetMan.notification(context.getPackageName(), 0, PrivacySettings.EMPTY, PrivacySettings.DATA_SEND_MMS, null, null);
++	    		PrivacyDebugger.i(TAG,"httpConnection - going to block outgoing mms");
++	    		throw new IOException("401");
++	    	} else {
++	    		if(settings != null && settings.isDefaultDenyObject())
++	    			pSetMan.notification(context.getPackageName(), 0, PrivacySettings.ERROR, PrivacySettings.DATA_SEND_MMS, null, null);
++	    		else
++	    			pSetMan.notification(context.getPackageName(), 0, PrivacySettings.REAL, PrivacySettings.DATA_SEND_MMS, null, null);
++	    		PrivacyDebugger.i(TAG,"httpConnection - going to allow outgoing mms");
++	    	}
++    	}
++    	//-------------------------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------
++        
+         try {
+             // Make sure to use a proxy which supports CONNECT.
+             URI hostUrl = new URI(url);

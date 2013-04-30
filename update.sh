@@ -70,7 +70,7 @@ sideload=Y
 #ROM
 
 cellbroadcast=Y
-openpdroid=N
+pdroid=N
 terminfo=Y
 emptydrawer=N
 massstorage=Y
@@ -177,8 +177,8 @@ mkdir -p ~/Downloads
 #Cleanup
 echo "*** Cleanup ***"
 
-#OpenPDroid
-if [ "${openpdroid}" = "Y" ]; then
+#PDroid
+if [ "${pdroid}" = "Y" ]; then
 	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
 	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
 	do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
@@ -265,8 +265,8 @@ fi
 
 #Prebuilts
 if [ "${openpdroid}" = "Y" ]; then
-	do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid_Manager.apk -O -L https://github.com/wsot/pdroid_manager_build/blob/master/PDroid_Manager_latest.apk?raw=true" ${android}/vendor/cm/get-prebuilts
-	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid_Manager.apk:system/app/PDroid_Manager.apk" ${android}/vendor/cm/config/common.mk
+	do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid2.0.apk -O -L https://github.com/CollegeDev/PDroid2.0_Manager_Compiled/raw/jellybean-devel/PDroid2.0.apk" ${android}/vendor/cm/get-prebuilts
+	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid2.0.apk:system/app/PDroid2.0.apk" ${android}/vendor/cm/config/common.mk
 fi
 
 if [ "${updates}" = "Y" ]; then
@@ -409,28 +409,22 @@ if [ "${cellbroadcast}" = "Y" ]; then
 fi
 
 #OpenPDroid
-if [ "${openpdroid}" = "Y" ]; then
-	echo "*** OpenPDroid ***"
-	cd ~/Downloads
-	if [ ! -d "OpenPDroidPatches" ]; then
-		git clone git://github.com/OpenPDroid/OpenPDroidPatches.git
-	fi
-	cd OpenPDroidPatches
-	git checkout 4.1.2-cm
-	git pull
+if [ "${pdroid}" = "Y" ]; then
+	echo "*** PDroid ***"
 
-	cd ${android}/build
-	patch -p1 --forward -r- <~/Downloads/OpenPDroidPatches/openpdroid_4.1.2-cm_build.patch
-	cd ${android}/libcore
-	patch -p1 --forward -r- <~/Downloads/OpenPDroidPatches/openpdroid_4.1.2-cm_libcore.patch
-	cd ${android}/packages/apps/Mms
-	patch -p1 --forward -r- <~/Downloads/OpenPDroidPatches/openpdroid_4.1.2-cm_packages_apps_Mms.patch
-	cd ${android}/frameworks/base
-	patch -p1 --forward -r- <~/Downloads/OpenPDroidPatches/openpdroid_4.1.2-cm_frameworks_base.patch
-	do_patch openpdroid_network_location.patch
+	cd ${android}
+	do_patch ${patches}/PDroid1.54/CM10.1_build.patch
+	do_patch ${patches}/PDroid1.54/CM10.1_libcore.patch
+	do_patch ${patches}/PDroid1.54/CM10.1_Mms.patch
+	do_patch ${patches}/PDroid1.54/CM10.1_framework.patch
+	do_patch ${patches}/PDroid1.54/CM10.1_Settings.patch
+
+	#TO DO:
+	#- patch Settings fails
+	#- http://forum.xda-developers.com/showpost.php?p=38794149&postcount=711
 
 	mkdir -p ${android}/privacy
-	cp ~/Downloads/OpenPDroidPatches/PDroid.jpeg ${android}/privacy
+	cp ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy
 	do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
 fi
 
