@@ -1,26 +1,21 @@
 diff --git a/prebuilt/init.semc.rc b/prebuilt/init.semc.rc
-index 96f1d45..8f87acd 100644
+index 695a5a6..6d06ab4 100644
 --- a/prebuilt/init.semc.rc
 +++ b/prebuilt/init.semc.rc
-@@ -115,6 +116,21 @@ on boot
-     write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 4
-     write /sys/devices/system/cpu/cpufreq/ondemand/down_differential 10
+@@ -134,6 +135,16 @@ on boot
+ 
+     mount debugfs /sys/kernel/debug /sys/kernel/debug
  
 +    # Xtended
-+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1017600
-+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 134400
++    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1024000
++    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 122880
 +    write /sys/block/mmcblk0/queue/scheduler sio
 +    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor smartassV2
-+
 +    chown root system /sys/devices/system/cpu/cpu0/cpufreq/vdd_levels
 +    chmod 664 /sys/devices/system/cpu/cpu0/cpufreq/vdd_levels
-+
 +    chown root system /sys/module/lowmemorykiller/parameters/minfree
 +    chmod 664 /sys/module/lowmemorykiller/parameters/minfree
 +
-+    chown root system /sys/module/sync/parameters/fsync_enabled
-+    chmod 664 /sys/module/sync/parameters/fsync_enabled
-+
-     mount debugfs /sys/kernel/debug /sys/kernel/debug
- 
- on property:init.svc.bluetoothd=running
+ service uim /system/bin/uim-sysfs
+     class core
+     user bluetooth
