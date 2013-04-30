@@ -193,7 +193,7 @@ index 54c91ff..b90a224 100644
  	st_gdata->protos_registered = 0;
  	spin_unlock_irqrestore(&st_gdata->lock, flags);
 diff --git a/drivers/misc/ti-st/st_kim.c b/drivers/misc/ti-st/st_kim.c
-index 38fd2f0..83269f1 100644
+index 38fd2f0..7fb920d 100644
 --- a/drivers/misc/ti-st/st_kim.c
 +++ b/drivers/misc/ti-st/st_kim.c
 @@ -35,6 +35,7 @@
@@ -614,7 +614,7 @@ index 38fd2f0..83269f1 100644
  {
  	struct ti_st_plat_data	*pdata = pdev->dev.platform_data;
  
-@@ -779,19 +863,8 @@ static struct platform_driver kim_platform_driver = {
+@@ -779,19 +863,24 @@ static struct platform_driver kim_platform_driver = {
  	},
  };
  
@@ -622,12 +622,26 @@ index 38fd2f0..83269f1 100644
 -{
 -	return platform_driver_register(&kim_platform_driver);
 -}
--
++#define module_driver(__driver, __register, __unregister, ...) \
++static int __init __driver##_init(void) \
++{ \
++        return __register(&(__driver) , ##__VA_ARGS__); \
++} \
++module_init(__driver##_init); \
++static void __exit __driver##_exit(void) \
++{ \
++        __unregister(&(__driver) , ##__VA_ARGS__); \
++} \
++module_exit(__driver##_exit);
+ 
 -static void __exit st_kim_deinit(void)
 -{
 -	platform_driver_unregister(&kim_platform_driver);
 -}
--
++#define module_platform_driver(__platform_driver) \
++	module_driver(__platform_driver, platform_driver_register, \
++			platform_driver_unregister)
+ 
 +module_platform_driver(kim_platform_driver);
  
 -module_init(st_kim_init);
