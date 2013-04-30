@@ -1,9 +1,9 @@
 diff --git a/BoardConfigCommon.mk b/BoardConfigCommon.mk
-index 5b59cc4..99cdd46 100644
+index 946a494..fb633e6 100644
 --- a/BoardConfigCommon.mk
 +++ b/BoardConfigCommon.mk
-@@ -29,8 +29,10 @@ ARCH_ARM_HAVE_TLS_REGISTER := true
- TARGET_HAVE_TSLIB := true
+@@ -29,8 +29,10 @@ TARGET_ARCH_VARIANT_CPU := cortex-a8
+ ARCH_ARM_HAVE_TLS_REGISTER := true
  TARGET_USE_SCORPION_BIONIC_OPTIMIZATION := true
  
 -TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
