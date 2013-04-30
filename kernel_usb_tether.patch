@@ -1,0 +1,50 @@
+diff --git a/arch/arm/configs/nAa_iyokan_defconfig b/arch/arm/configs/nAa_iyokan_defconfig
+index 6834c3a..99d1e08 100644
+--- a/arch/arm/configs/nAa_iyokan_defconfig
++++ b/arch/arm/configs/nAa_iyokan_defconfig
+@@ -1266,7 +1266,7 @@ CONFIG_DUMMY=y
+ # CONFIG_EQUALIZER is not set
+ # CONFIG_TUN is not set
+ # CONFIG_VETH is not set
+-# CONFIG_MII is not set
++CONFIG_MII=y
+ # CONFIG_PHYLIB is not set
+ # CONFIG_NET_ETHERNET is not set
+ CONFIG_NETDEV_1000=y
+@@ -1307,9 +1307,35 @@ CONFIG_WLAN=y
+ # CONFIG_USB_KAWETH is not set
+ # CONFIG_USB_PEGASUS is not set
+ # CONFIG_USB_RTL8150 is not set
+-# CONFIG_USB_USBNET is not set
++CONFIG_USB_USBNET=y
++CONFIG_USB_NET_AX8817X=y
++CONFIG_USB_NET_CDCETHER=y
++# CONFIG_USB_NET_CDC_EEM is not set
++CONFIG_USB_NET_CDC_NCM=y
++# CONFIG_USB_NET_DM9601 is not set
++# CONFIG_USB_NET_SMSC75XX is not set
++# CONFIG_USB_NET_SMSC95XX is not set
++# CONFIG_USB_NET_GL620A is not set
++CONFIG_USB_NET_NET1080=y
++# CONFIG_USB_NET_PLUSB is not set
++# CONFIG_USB_NET_MCS7830 is not set
++CONFIG_USB_NET_RNDIS_HOST=y
++CONFIG_USB_NET_CDC_SUBSET=y
++# CONFIG_USB_ALI_M5632 is not set
++# CONFIG_USB_AN2720 is not set
++CONFIG_USB_BELKIN=y
++CONFIG_USB_ARMLINUX=y
++# CONFIG_USB_EPSON2888 is not set
++# CONFIG_USB_KC2190 is not set
++CONFIG_USB_NET_ZAURUS=y
++# CONFIG_USB_NET_CX82310_ETH is not set
++# CONFIG_USB_NET_KALMIA is not set
+ # CONFIG_USB_HSO is not set
++# CONFIG_USB_NET_INT51X1 is not set
+ # CONFIG_USB_IPHETH is not set
++# CONFIG_USB_SIERRA_NET is not set
++# CONFIG_USB_VL600 is not set
++# CONFIG_MSM_RMNET_USB is not set
+ # CONFIG_WAN is not set
+ 
+ #

@@ -1,0 +1,15 @@
+diff --git a/net/compat-wireless/drivers/net/wireless/wl12xx/rx.h b/net/compat-wireless/drivers/net/wireless/wl12xx/rx.h
+index c91975f..f77edf5 100644
+--- a/net/compat-wireless/drivers/net/wireless/wl12xx/rx.h
++++ b/net/compat-wireless/drivers/net/wireless/wl12xx/rx.h
+@@ -27,8 +27,8 @@
+ 
+ #include <linux/bitops.h>
+ 
+-#define WL1271_RX_MAX_RSSI -30
+-#define WL1271_RX_MIN_RSSI -95
++#define WL1271_RX_MAX_RSSI -20
++#define WL1271_RX_MIN_RSSI -115
+ 
+ #define SHORT_PREAMBLE_BIT   BIT(0)
+ #define OFDM_RATE_BIT        BIT(6)

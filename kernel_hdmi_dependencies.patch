@@ -1,0 +1,36 @@
+From 1af216118013db09bd02265db8ff81f044ea2780 Mon Sep 17 00:00:00 2001
+From: adridu59 <adri-from-59@hotmail.fr>
+Date: Thu, 25 Apr 2013 22:25:00 +0200
+Subject: [PATCH] sii9024a: select required dependencies
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Select HDMI common bits.
+
+This fixes linker error:
+~/msm7x30-3.0.x-nAa/drivers/video/msm/mdp4_overlay.c:277: undefined reference to « mdp_vid_quant_set »
+
+Thanks to @M66B for the suggestion.
+
+Signed-off-by: Adrien Tétar <adrien.tetar@hotmail.fr>
+---
+ drivers/video/msm/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/video/msm/Kconfig b/drivers/video/msm/Kconfig
+index 48a794b..039be3e 100644
+--- a/drivers/video/msm/Kconfig
++++ b/drivers/video/msm/Kconfig
+@@ -659,6 +659,8 @@ config FB_MSM_HDMI_SII9024A_PANEL
+         depends on FB_MSM_MDP40
+         bool "LCDC HDMI SiI9024A 720p Panel"
+         select FB_MSM_DTV
++        select FB_MSM_EXT_INTERFACE_COMMON
++        select FB_MSM_HDMI_COMMON
+         select UIO
+         select UIO_PDRV_GENIRQ
+         default n
+-- 
+1.8.1.6
+

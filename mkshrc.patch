@@ -1,0 +1,10 @@
+diff --git a/mkshrc b/mkshrc
+index 0da5ea6..0e13517 100644
+--- a/mkshrc
++++ b/mkshrc
+@@ -26,4 +26,5 @@ done
+ 
+ unset p
+ 
++export TERMINFO=/etc/terminfo
+ : place customisations above this line

@@ -1,0 +1,77 @@
+diff --git a/recovery.c b/recovery.c
+index 0f56d0e..9e30136 100644
+--- a/recovery.c
++++ b/recovery.c
+@@ -783,6 +783,53 @@ setup_adbd() {
+     property_set("service.adb.root", "1");
+ }
+ 
++int get_pin() {
++    char code[5] = "";
++    char pin[] = "????";
++
++    // Read pin code
++    FILE* fp = fopen("/cache/pin/code", "r");
++    if (fp != NULL) {
++        if (fgets(code, sizeof(code), fp)) {
++            char *n = strchr(code, '\n');
++            if (n) *n = 0;
++        }
++        fclose(fp);
++    }
++
++    if (*code == 0)
++        *pin = 0;
++    else {
++        int i;
++        char item[] = "----";
++        const char* headers[] = { "Enter pincode:", "", item, "", NULL };
++        const char* digits[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", NULL };
++
++        // Get pincode
++        for (i = 0; i < strlen(item); i++) {
++            int digit = get_menu_selection(prepend_title(headers), digits, 0, 0);
++            if (digit == GO_BACK) {
++                i = -1;
++                memset(pin, '?', 4);
++                memset(item, '-', 4);
++            }
++            else {
++                pin[i] = '0' + digit;
++                item[i] = '*';
++            }
++        }
++    }
++
++    // Check pincode
++    if (strcmp(pin, code))
++        return false;
++    else {
++        __system("touch /cache/pin/ok");
++        __system("/sbin/adbd &");
++        return true;
++    }
++}
++
+ int
+ main(int argc, char **argv) {
+ 
+@@ -964,14 +1011,15 @@ main(int argc, char **argv) {
+         }
+     }
+ 
+-    setup_adbd();
+-
+     if (status != INSTALL_SUCCESS && !is_user_initiated_recovery) {
+         ui_set_show_text(1);
+         ui_set_background(BACKGROUND_ICON_ERROR);
+     }
+     if (status != INSTALL_SUCCESS || ui_text_visible()) {
+-        prompt_and_wait();
++        if (get_pin())
++            prompt_and_wait();
++        else
++            poweroff = 1;
+     }
+ 
+     verify_root_and_recovery();

@@ -1,0 +1,17 @@
+diff --git a/BoardConfigCommon.mk b/BoardConfigCommon.mk
+index 5b59cc4..99cdd46 100644
+--- a/BoardConfigCommon.mk
++++ b/BoardConfigCommon.mk
+@@ -29,8 +29,10 @@ ARCH_ARM_HAVE_TLS_REGISTER := true
+ TARGET_HAVE_TSLIB := true
+ TARGET_USE_SCORPION_BIONIC_OPTIMIZATION := true
+ 
+-TARGET_GLOBAL_CFLAGS += -mfpu=neon -mfloat-abi=softfp
+-TARGET_GLOBAL_CPPFLAGS += -mfpu=neon -mfloat-abi=softfp
++ARCH_ARM_HAVE_ARMV7A := true
++TARGET_GLOBAL_CFLAGS += -O3 -mfpu=neon -mfloat-abi=softfp -fmodulo-sched -fmodulo-sched-allow-regmoves
++TARGET_GLOBAL_CPPFLAGS += -O3 -mfpu=neon -mfloat-abi=softfp -fmodulo-sched -fmodulo-sched-allow-regmoves
++TARGET_GLOBAL_LDFLAGS += --hash-style=gnu
+ 
+ # QCOM Hardware
+ BOARD_USES_QCOM_HARDWARE := true

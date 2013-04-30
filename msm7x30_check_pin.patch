@@ -1,0 +1,59 @@
+diff --git a/combinedroot/init.sh b/combinedroot/init.sh
+index d9c6215..10165c0 100644
+--- a/combinedroot/init.sh
++++ b/combinedroot/init.sh
+@@ -70,15 +70,42 @@ busybox mount -t yaffs2 /dev/block/mtdblock${MTDCACHE} /cache
+ # android ramdisk
+ load_image=/sbin/ramdisk.cpio
+ 
++# setup pincode
++busybox mkdir -p /cache/pin
++busybox chmod -R 770 /cache/pin
++busybox chown -R root:system /cache/pin
++
++# offline charging?
++charging=0
++bootreason=`busybox cat /proc/cmdline | busybox tr ' ' '\n' | busybox grep startup | busybox awk -F '=' {'print $2'}`
++if [ "${bootreason}" = "0x00000020" ]; then
++	charging=1
++fi
++busybox echo "${charging}" >/cache/pin/charging
++
++# pincode check?
++checkpin=N
++if [ -e /cache/pin/code -a ! -e /cache/pin/ok -a "${charging}" = "0" ]; then
++	checkpin=Y
++fi
++
+ # boot decision
+-if [ -s /dev/keycheck -o -e /cache/recovery/boot ]
++if [ -s /dev/keycheck -o -e /cache/recovery/boot -o "${checkpin}" = "Y" ]
+ then
+ 	busybox echo 'RECOVERY BOOT' >>boot.txt
+ 	busybox rm -fr /cache/recovery/boot
+ 	# trigger blue led
+-	busybox echo 0 > ${BOOTREC_LED_RED}
+-	busybox echo 0 > ${BOOTREC_LED_GREEN}
+-	busybox echo 255 > ${BOOTREC_LED_BLUE}
++	if [ "${checkpin}" = "Y" ]; then
++		# trigger red led
++		busybox echo 255 > ${BOOTREC_LED_RED}/brightness
++		busybox echo 0 > ${BOOTREC_LED_GREEN}/brightness
++		busybox echo 0 > ${BOOTREC_LED_BLUE}/brightness
++	else
++		# trigger blue led
++		busybox echo 0 > ${BOOTREC_LED_RED}/brightness
++		busybox echo 0 > ${BOOTREC_LED_GREEN}/brightness
++		busybox echo 255 > ${BOOTREC_LED_BLUE}/brightness
++	fi
+ 	busybox echo 0 > ${BOOTREC_LED_BUTTONS}
+ 	# framebuffer fix
+ 	busybox echo 0 > /sys/module/msm_fb/parameters/align_buffer
+@@ -86,6 +113,7 @@ then
+ 	load_image=/sbin/ramdisk-recovery.cpio
+ else
+ 	busybox echo 'ANDROID BOOT' >>boot.txt
++	busybox rm -f /cache/pin/ok
+ 	# poweroff LED & button-backlight
+ 	busybox echo 0 > ${BOOTREC_LED_RED}
+ 	busybox echo 0 > ${BOOTREC_LED_GREEN}

@@ -1,0 +1,39 @@
+diff --git a/mogami.mk b/mogami.mk
+index 5ae1d99..8311307 100644
+--- a/mogami.mk
++++ b/mogami.mk
+@@ -27,6 +27,10 @@ PRODUCT_COPY_FILES += \
+ PRODUCT_COPY_FILES += \
+     device/semc/mogami-common/prebuilt/init.semc.rc:root/init.semc.rc
+ 
++# Charging check
++PRODUCT_COPY_FILES += \
++    device/semc/mogami-common/prebuilt/charging.sh:root/charging.sh
++
+ # WiFi config & related files
+ PRODUCT_COPY_FILES += \
+     device/semc/mogami-common/prebuilt/hostapd.conf:system/etc/wifi/hostapd.conf \
+diff --git a/prebuilt/init.semc.rc b/prebuilt/init.semc.rc
+index 96f1d45..1e5454e 100644
+--- a/prebuilt/init.semc.rc
++++ b/prebuilt/init.semc.rc
+@@ -3,6 +3,7 @@ import init.semc.usb.rc
+ on early-boot
+     #offline charging
+     exec /system/bin/chargemon
++    exec /system/bin/sh /charging.sh
+ 
+ on post-fs-data
+     mkdir /data/misc/wifi 0770 wifi wifi
+diff --git a/prebuilt/charging.sh b/prebuilt/charging.sh
+new file mode 100644
+index 0000000..578146e
+--- /dev/null
++++ b/prebuilt/charging.sh
+@@ -0,0 +1,6 @@
++#!/system/bin/sh
++charging=`busybox cat /cache/pin/charging`
++busybox echo "${charging}" >/cache/pin/charged
++if [ "${charging}" = "1" ]; then
++	busybox reboot
++fi

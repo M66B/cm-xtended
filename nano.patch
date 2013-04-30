@@ -1,0 +1,49 @@
+From 7b568f0b417c1fe3fe8597c600bdbcda4837013f Mon Sep 17 00:00:00 2001
+From: Paul Mongold <pmongold@gmail.com>
+Date: Wed, 21 Mar 2012 00:28:54 -0400
+Subject: [PATCH] nano: hack to insert newline on enter key instead of
+ "Unknown Command"
+
+   * fixes usage on both terminal emulator and adb shell
+
+Change-Id: I893556f7d8855957b19d1ade5ee7ee53ca26f4b6
+---
+ src/nano.c   |    5 +++++
+ src/prompt.c |    5 +++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/src/nano.c b/src/nano.c
+index 59e2a9d..8cced7f 100644
+--- a/src/nano.c
++++ b/src/nano.c
+@@ -1528,6 +1528,11 @@ int do_input(bool *meta_key, bool *func_key, bool *s_or_t, bool
+     }
+ #endif
+ 
++    /* Workaround for enter key*/
++    if (input == 10) {
++        input = NANO_CONTROL_M;
++    }
++
+     /* Check for a shortcut in the main list. */
+     s = get_shortcut(MMAIN, &input, meta_key, func_key);
+ 
+diff --git a/src/prompt.c b/src/prompt.c
+index afb36d6..6f24574 100644
+--- a/src/prompt.c
++++ b/src/prompt.c
+@@ -87,6 +87,11 @@ int do_statusbar_input(bool *meta_key, bool *func_key, bool *have_shortcut,
+     }
+ #endif
+ 
++    /* Workaround for enter key*/
++    if (input == 10) {
++        input = NANO_CONTROL_M;
++    }
++
+     /* Check for a shortcut in the current list. */
+     s = get_shortcut(currmenu, &input, meta_key, func_key);
+ 
+-- 
+1.7.10
+

@@ -1,0 +1,170 @@
+diff --git a/drivers/staging/udlfb/Kconfig b/drivers/staging/udlfb/Kconfig
+index 641692d..98575fc 100644
+--- a/drivers/staging/udlfb/Kconfig
++++ b/drivers/staging/udlfb/Kconfig
+@@ -1,6 +1,11 @@
+ config FB_UDL
+ 	tristate "Displaylink USB Framebuffer support"
+ 	depends on FB && USB
++        select FB_MODE_HELPERS
++        select FB_CFB_FILLRECT
++        select FB_CFB_COPYAREA
++        select FB_CFB_IMAGEBLIT
++
+ 	---help---
+ 	  This is an experimental driver for DisplayLink USB devices
+ 	  that provides a framebuffer device.  A normal framebuffer can
+diff --git a/drivers/usb/core/otg_whitelist.h b/drivers/usb/core/otg_whitelist.h
+index 7075b5d..af080e9 100644
+--- a/drivers/usb/core/otg_whitelist.h
++++ b/drivers/usb/core/otg_whitelist.h
+@@ -55,6 +55,18 @@ static struct usb_device_id whitelist_table [] = {
+ { USB_INTERFACE_INFO(USB_CLASS_VENDOR_SPEC, 0x5d, 0x01), },
+ #endif
+ 
++#ifdef CONFIG_FB_UDL
++{.idVendor = 0x17e9,
++ .bInterfaceClass = 0xff,
++ .bInterfaceSubClass = 0x00,
++ .bInterfaceProtocol = 0x00,
++ .match_flags = USB_DEVICE_ID_MATCH_VENDOR |
++	USB_DEVICE_ID_MATCH_INT_CLASS |
++	USB_DEVICE_ID_MATCH_INT_SUBCLASS |
++	USB_DEVICE_ID_MATCH_INT_PROTOCOL,
++},
++#endif
++
+ { }	/* Terminating entry */
+ };
+ 
+diff --git a/drivers/staging/udlfb/udlfb.c b/drivers/staging/udlfb/udlfb.c
+index f5416af..893fea7 100644
+--- a/drivers/staging/udlfb/udlfb.c
++++ b/drivers/staging/udlfb/udlfb.c
+@@ -167,7 +167,7 @@ image_blit(struct dlfb_data *dev_info, int x, int y, int width, int height,
+ 	if (x + width > dev_info->info->var.xres)
+ 		return -EINVAL;
+ 
+-	if (y + height > dev_info->info->var.yres)
++	if (y + height > dev_info->info->var.yres * 2) //hideo
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&dev_info->bulk_mutex);
+@@ -302,7 +302,7 @@ draw_rect(struct dlfb_data *dev_info, int x, int y, int width, int height,
+ 	if (x + width > dev_info->info->var.xres)
+ 		return -EINVAL;
+ 
+-	if (y + height > dev_info->info->var.yres)
++	if (y + height > dev_info->info->var.yres*2) //hideo
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&dev_info->bulk_mutex);
+@@ -490,7 +490,7 @@ copyarea(struct dlfb_data *dev_info, int dx, int dy, int sx, int sy,
+ 	if (dx + width > dev_info->info->var.xres)
+ 		return -EINVAL;
+ 
+-	if (dy + height > dev_info->info->var.yres)
++	if (dy + height > dev_info->info->var.yres * 2) //hideo
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&dev_info->bulk_mutex);
+@@ -688,6 +688,18 @@ dlfb_setcolreg(unsigned regno, unsigned red, unsigned green,
+ 	return err;
+ }
+ 
++static int dlfb_pan_display(struct fb_var_screeninfo *var,
++                struct fb_info *fbi)
++{
++	struct dlfb_data *dev = fbi->par;
++
++	image_blit(dev, 0, 0, var->xres, var->yres, fbi->screen_base );
++
++        return 0;
++}
++
++
++
+ static int dlfb_release(struct fb_info *info, int user)
+ {
+ 	struct dlfb_data *dev_info = info->par;
+@@ -714,6 +726,20 @@ static int dlfb_blank(int blank_mode, struct fb_info *info)
+ 	return 0;
+ }
+ 
++static int dlfb_open(struct fb_info *info, int user) {
++	return 0;
++}
++static int dlfb_checkvar(struct fb_var_screeninfo *var, struct fb_info *info) {
++	struct dlfb_data *dev = info->par;
++	image_blit(dev, 0, 0, var->xres, var->yres, info->screen_base + dev->screen_size/2);
++
++	return 0;
++}
++
++static int dlfb_setpar(struct fb_info *info) {
++	return 0;
++}
++
+ static struct fb_ops dlfb_ops = {
+ 	.fb_setcolreg = dlfb_setcolreg,
+ 	.fb_fillrect = dlfb_fillrect,
+@@ -721,8 +747,13 @@ static struct fb_ops dlfb_ops = {
+ 	.fb_imageblit = dlfb_imageblit,
+ 	.fb_mmap = dlfb_mmap,
+ 	.fb_ioctl = dlfb_ioctl,
++	.fb_open = dlfb_open,
+ 	.fb_release = dlfb_release,
+ 	.fb_blank = dlfb_blank,
++	.fb_check_var = dlfb_checkvar,
++	.fb_set_par = dlfb_setpar,
++	.fb_pan_display = dlfb_pan_display,
++
+ };
+ 
+ static int
+@@ -784,8 +815,10 @@ dlfb_probe(struct usb_interface *interface, const struct usb_device_id *id)
+ 	printk("EDID XRES %d YRES %d\n", info->var.xres, info->var.yres);
+ 
+ 	if (dlfb_set_video_mode(dev_info, info->var.xres, info->var.yres) != 0) {
+-		info->var.xres = 1280;
+-		info->var.yres = 1024;
++		//info->var.xres = 1280;
++		//info->var.yres = 1024;
++		info->var.xres = 1024;
++		info->var.yres = 768;
+ 		if (dlfb_set_video_mode
+ 		    (dev_info, info->var.xres, info->var.yres) != 0) {
+ 			goto out;
+@@ -823,7 +856,8 @@ dlfb_probe(struct usb_interface *interface, const struct usb_device_id *id)
+ 
+ 	info->var.bits_per_pixel = 16;
+ 	info->var.activate = FB_ACTIVATE_TEST;
+-	info->var.vmode = FB_VMODE_NONINTERLACED;
++	info->var.vmode = FB_VMODE_NONINTERLACED|FB_VMODE_YWRAP; //hideo
++	info->var.yres_virtual = info->var.yres * 2;	//hideo
+ 
+ 	info->var.red.offset = 11;
+ 	info->var.red.length = 5;
+@@ -851,6 +885,9 @@ dlfb_probe(struct usb_interface *interface, const struct usb_device_id *id)
+ 	info->fix.visual = FB_VISUAL_TRUECOLOR;
+ 	info->fix.accel = info->flags;
+ 	info->fix.line_length = dev_info->line_length;
++        info->fix.ypanstep = 1;
++        info->fix.ywrapstep = 0;
++
+ 
+ 	if (fb_alloc_cmap(&info->cmap, 256, 0) < 0)
+ 		goto out1;
+diff --git a/drivers/staging/udlfb/udlfb.h b/drivers/staging/udlfb/udlfb.h
+index 40ad85e..07bc514 100644
+--- a/drivers/staging/udlfb/udlfb.h
++++ b/drivers/staging/udlfb/udlfb.h
+@@ -212,7 +212,7 @@ static int dlfb_set_video_mode(struct dlfb_data *dev_info, int width, int height
+ 			ret = dlfb_bulk_msg(dev_info, 0);
+ 			printk("ret bulk 3: %d\n", ret);
+ 
+-			dev_info->screen_size = width * height * (FB_BPP / 8);
++			dev_info->screen_size = width * height * 2 * (FB_BPP / 8);
+ 			dev_info->line_length = width * (FB_BPP / 8);
+ 
+ 			return 0;

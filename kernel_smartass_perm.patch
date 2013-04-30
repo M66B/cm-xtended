@@ -1,0 +1,24 @@
+diff --git a/drivers/cpufreq/cpufreq_smartass2.c b/drivers/cpufreq/cpufreq_smartass2.c
+index d50c7ab..d9b9cab 100644
+--- a/drivers/cpufreq/cpufreq_smartass2.c
++++ b/drivers/cpufreq/cpufreq_smartass2.c
+@@ -728,7 +728,7 @@ static ssize_t store_boost_pulse(struct kobject *kobj, struct attribute *attr, c
+ 
+ #define define_global_rw_attr(_name)		\
+ static struct global_attr _name##_attr =	\
+-	__ATTR(_name, 0644, show_##_name, store_##_name)
++	__ATTR(_name, 0666, show_##_name, store_##_name)
+ 
+ define_global_rw_attr(debug_mask);
+ define_global_rw_attr(up_rate_us);
+--- a/drivers/cpufreq/cpufreq_smartassH3.c	2013-04-01 19:08:02.193011050 +0200
++++ b/drivers/cpufreq/cpufreq_smartassH3.c	2013-04-01 20:40:32.000000000 +0200
+@@ -732,7 +732,7 @@ static ssize_t store_boost_pulse(struct
+ 
+ #define define_global_rw_attr(_name)		\
+ static struct global_attr _name##_attr =	\
+-	__ATTR(_name, 0644, show_##_name, store_##_name)
++	__ATTR(_name, 0666, show_##_name, store_##_name)
+ 
+ define_global_rw_attr(debug_mask);
+ define_global_rw_attr(up_rate_us);

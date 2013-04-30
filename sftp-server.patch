@@ -1,0 +1,29 @@
+diff --git a/Android.mk b/Android.mk
+index f418740..5b477c8 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -151,6 +151,24 @@ LOCAL_SHARED_LIBRARIES += libssh libssl libcrypto libdl libz
+ 
+ include $(BUILD_EXECUTABLE)
+ 
++###################### sftp-server ######################
++
++include $(CLEAR_VARS)
++
++LOCAL_MODULE_TAGS := optional
++
++LOCAL_SRC_FILES := \
++	sftp-server.c sftp-common.c sftp-server-main.c
++
++LOCAL_MODULE := sftp-server
++
++LOCAL_C_INCLUDES := external/openssl/include
++PRIVATE_C_INCLUDES := external/openssl/openbsd-compat
++
++LOCAL_SHARED_LIBRARIES += libssh libssl libcrypto libdl libz
++
++include $(BUILD_EXECUTABLE)
++
+ ###################### sshd_config ######################
+ 
+ include $(CLEAR_VARS)

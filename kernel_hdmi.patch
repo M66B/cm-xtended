@@ -1,0 +1,129 @@
+From 99865385101330db4292a1d4030cd7892c0499df Mon Sep 17 00:00:00 2001
+From: adridu59 <adri-from-59@hotmail.fr>
+Date: Thu, 25 Apr 2013 22:29:04 +0200
+Subject: [PATCH] haida,hallon,iyokan: enable HDMI
+
+---
+ arch/arm/configs/nAa_haida_defconfig  | 13 ++++++++-----
+ arch/arm/configs/nAa_hallon_defconfig | 13 ++++++++-----
+ arch/arm/configs/nAa_iyokan_defconfig |  9 +++++----
+ 3 files changed, 21 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm/configs/nAa_haida_defconfig b/arch/arm/configs/nAa_haida_defconfig
+index 397d525..8aa4cff 100644
+--- a/arch/arm/configs/nAa_haida_defconfig
++++ b/arch/arm/configs/nAa_haida_defconfig
+@@ -2109,7 +2109,7 @@ CONFIG_FB_MSM_MDDI=y
+ # CONFIG_FB_MSM_MIPI_DSI is not set
+ # CONFIG_FB_MSM_LCDC is not set
+ CONFIG_FB_MSM_OVERLAY=y
+-# CONFIG_FB_MSM_DTV is not set
++CONFIG_FB_MSM_DTV=y
+ # CONFIG_FB_MSM_EXTMDDI is not set
+ # CONFIG_FB_MSM_TVOUT is not set
+ # CONFIG_FB_MSM_MDDI_TOSHIBA_COMMON is not set
+@@ -2179,13 +2179,14 @@ CONFIG_FB_MSM_OVERLAY=y
+ # CONFIG_FB_MSM_MIPI_TRULY_VIDEO_WVGA_PT_PANEL is not set
+ # CONFIG_FB_MSM_MIPI_SIMULATOR_VIDEO_PANEL is not set
+ # CONFIG_FB_MSM_EBI2_TMD_QVGA_EPSON_QCIF is not set
++# CONFIG_FB_MSM_HDMI_AS_PRIMARY is not set
+ CONFIG_FB_MSM_PANEL_NONE=y
+-# CONFIG_FB_MSM_EXT_INTERFACE_COMMON is not set
+-# CONFIG_FB_MSM_HDMI_COMMON is not set
++CONFIG_FB_MSM_EXT_INTERFACE_COMMON=y
++CONFIG_FB_MSM_HDMI_COMMON=y
+ # CONFIG_FB_MSM_HDMI_3D is not set
+ # CONFIG_FB_MSM_HDMI_ADV7520_PANEL is not set
+ # CONFIG_FB_MSM_HDMI_MSM_PANEL is not set
+-# CONFIG_FB_MSM_HDMI_SII9024A_PANEL is not set
++CONFIG_FB_MSM_HDMI_SII9024A_PANEL=y
+ # CONFIG_FB_MSM_TVOUT_NTSC_M is not set
+ # CONFIG_FB_MSM_TVOUT_NTSC_J is not set
+ # CONFIG_FB_MSM_TVOUT_PAL_BDGHIN is not set
+@@ -2666,7 +2667,9 @@ CONFIG_RTC_SECURE_TIME_SUPPORT=y
+ # CONFIG_RTC_DRV_PM8XXX is not set
+ # CONFIG_DMADEVICES is not set
+ # CONFIG_AUXDISPLAY is not set
+-# CONFIG_UIO is not set
++CONFIG_UIO=y
++# CONFIG_UIO_PDRV is not set
++CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_STAGING=y
+ # CONFIG_VIDEO_TM6000 is not set
+ # CONFIG_USBIP_CORE is not set
+diff --git a/arch/arm/configs/nAa_hallon_defconfig b/arch/arm/configs/nAa_hallon_defconfig
+index bb93ed5..d651210 100644
+--- a/arch/arm/configs/nAa_hallon_defconfig
++++ b/arch/arm/configs/nAa_hallon_defconfig
+@@ -2109,7 +2109,7 @@ CONFIG_FB_MSM_MDDI=y
+ # CONFIG_FB_MSM_MIPI_DSI is not set
+ # CONFIG_FB_MSM_LCDC is not set
+ CONFIG_FB_MSM_OVERLAY=y
+-# CONFIG_FB_MSM_DTV is not set
++CONFIG_FB_MSM_DTV=y
+ # CONFIG_FB_MSM_EXTMDDI is not set
+ # CONFIG_FB_MSM_TVOUT is not set
+ # CONFIG_FB_MSM_MDDI_TOSHIBA_COMMON is not set
+@@ -2179,13 +2179,14 @@ CONFIG_FB_MSM_OVERLAY=y
+ # CONFIG_FB_MSM_MIPI_TRULY_VIDEO_WVGA_PT_PANEL is not set
+ # CONFIG_FB_MSM_MIPI_SIMULATOR_VIDEO_PANEL is not set
+ # CONFIG_FB_MSM_EBI2_TMD_QVGA_EPSON_QCIF is not set
++# CONFIG_FB_MSM_HDMI_AS_PRIMARY is not set
+ CONFIG_FB_MSM_PANEL_NONE=y
+-# CONFIG_FB_MSM_EXT_INTERFACE_COMMON is not set
+-# CONFIG_FB_MSM_HDMI_COMMON is not set
++CONFIG_FB_MSM_EXT_INTERFACE_COMMON=y
++CONFIG_FB_MSM_HDMI_COMMON=y
+ # CONFIG_FB_MSM_HDMI_3D is not set
+ # CONFIG_FB_MSM_HDMI_ADV7520_PANEL is not set
+ # CONFIG_FB_MSM_HDMI_MSM_PANEL is not set
+-# CONFIG_FB_MSM_HDMI_SII9024A_PANEL is not set
++CONFIG_FB_MSM_HDMI_SII9024A_PANEL=y
+ # CONFIG_FB_MSM_TVOUT_NTSC_M is not set
+ # CONFIG_FB_MSM_TVOUT_NTSC_J is not set
+ # CONFIG_FB_MSM_TVOUT_PAL_BDGHIN is not set
+@@ -2666,7 +2667,9 @@ CONFIG_RTC_SECURE_TIME_SUPPORT=y
+ # CONFIG_RTC_DRV_PM8XXX is not set
+ # CONFIG_DMADEVICES is not set
+ # CONFIG_AUXDISPLAY is not set
+-# CONFIG_UIO is not set
++CONFIG_UIO=y
++# CONFIG_UIO_PDRV is not set
++CONFIG_UIO_PDRV_GENIRQ=y
+ CONFIG_STAGING=y
+ # CONFIG_VIDEO_TM6000 is not set
+ # CONFIG_USBIP_CORE is not set
+diff --git a/arch/arm/configs/nAa_iyokan_defconfig b/arch/arm/configs/nAa_iyokan_defconfig
+index 6834c3a..0178749 100644
+--- a/arch/arm/configs/nAa_iyokan_defconfig
++++ b/arch/arm/configs/nAa_iyokan_defconfig
+@@ -2112,7 +2112,7 @@ CONFIG_FB_MSM_MDDI=y
+ # CONFIG_FB_MSM_MIPI_DSI is not set
+ # CONFIG_FB_MSM_LCDC is not set
+ CONFIG_FB_MSM_OVERLAY=y
+-# CONFIG_FB_MSM_DTV is not set
++CONFIG_FB_MSM_DTV=y
+ # CONFIG_FB_MSM_EXTMDDI is not set
+ # CONFIG_FB_MSM_TVOUT is not set
+ # CONFIG_FB_MSM_MDDI_TOSHIBA_COMMON is not set
+@@ -2182,13 +2182,14 @@ CONFIG_FB_MSM_OVERLAY=y
+ # CONFIG_FB_MSM_MIPI_TRULY_VIDEO_WVGA_PT_PANEL is not set
+ # CONFIG_FB_MSM_MIPI_SIMULATOR_VIDEO_PANEL is not set
+ # CONFIG_FB_MSM_EBI2_TMD_QVGA_EPSON_QCIF is not set
++# CONFIG_FB_MSM_HDMI_AS_PRIMARY is not set
+ CONFIG_FB_MSM_PANEL_NONE=y
+-# CONFIG_FB_MSM_EXT_INTERFACE_COMMON is not set
+-# CONFIG_FB_MSM_HDMI_COMMON is not set
++CONFIG_FB_MSM_EXT_INTERFACE_COMMON=y
++CONFIG_FB_MSM_HDMI_COMMON=y
+ # CONFIG_FB_MSM_HDMI_3D is not set
+ # CONFIG_FB_MSM_HDMI_ADV7520_PANEL is not set
+ # CONFIG_FB_MSM_HDMI_MSM_PANEL is not set
+-# CONFIG_FB_MSM_HDMI_SII9024A_PANEL is not set
++CONFIG_FB_MSM_HDMI_SII9024A_PANEL=y
+ # CONFIG_FB_MSM_TVOUT_NTSC_M is not set
+ # CONFIG_FB_MSM_TVOUT_NTSC_J is not set
+ # CONFIG_FB_MSM_TVOUT_PAL_BDGHIN is not set
+-- 
+1.8.1.6
+
