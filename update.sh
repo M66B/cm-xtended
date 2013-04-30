@@ -65,6 +65,7 @@ bootlogoh=logo_H_extended.png
 bootlogom=logo_M_extended.png
 
 pin=Y
+sideload=Y
 
 #ROM
 
@@ -385,6 +386,12 @@ if [ "${pin}" = "Y" ]; then
 		initrc=${android}/device/semc/${device}/recovery/init.rc
 		do_replace "    restart adbd" "    #restart adbd" ${initrc}
 	done
+fi
+
+if [ "${sideload}" = "Y" ]; then
+	echo "*** CWM sideload cancel"
+	cd ${android}/bootable/recovery
+	do_patch recovery_sideload.patch
 fi
 
 #--- ROM ---
