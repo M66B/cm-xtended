@@ -20,7 +20,7 @@ License
 
 GNU General Public License version 3
 
-Copyright (c) 2013 Marcel Bokhorst http://blog.bokhorst.biz/about/
+Copyright (c) 2013 [Marcel Bokhorst](http://blog.bokhorst.biz/about/)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
