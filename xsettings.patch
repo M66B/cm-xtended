@@ -264,7 +264,7 @@ index ee87e51..438016b 100644
  
      <PreferenceCategory android:key="credentials_management"
 diff --git a/src/com/android/settings/SecuritySettings.java b/src/com/android/settings/SecuritySettings.java
-index e124fa2..0430658 100644
+index e124fa2..ff2f7da 100644
 --- a/src/com/android/settings/SecuritySettings.java
 +++ b/src/com/android/settings/SecuritySettings.java
 @@ -35,6 +35,7 @@ import android.os.UserHandle;
@@ -307,10 +307,10 @@ index e124fa2..0430658 100644
           }
  
          return root;
-@@ -691,6 +703,14 @@ public class SecuritySettings extends SettingsPreferenceFragment
-         } else if (KEY_TOGGLE_VERIFY_APPLICATIONS.equals(key)) {
-             Settings.Global.putInt(getContentResolver(), Settings.Global.PACKAGE_VERIFIER_ENABLE,
-                     mToggleVerifyApps.isChecked() ? 1 : 0);
+@@ -752,6 +764,14 @@ public class SecuritySettings extends SettingsPreferenceFragment
+             Settings.Global.putInt(getContentResolver(), Settings.Global.SMS_OUTGOING_CHECK_MAX_COUNT,
+                      smsSecurityCheck);
+             updateSmsSecuritySummary(smsSecurityCheck);
 +        } else if (preference == mBootPincode) {
 +            String pincode = (String)value;
 +            if (pincode != null && pincode.length() == 4)
@@ -319,9 +319,9 @@ index e124fa2..0430658 100644
 +                File pfile = new File(SecuritySettings.BOOT_PINCODE_FILE);
 +                pfile.delete();
 +            }
-         } else {
-             // If we didn't handle it, let preferences handle it.
-             return super.onPreferenceTreeClick(preferenceScreen, preference);
+         }
+         return true;
+     }
 diff --git a/src/com/android/settings/cyanogenmod/BootReceiver.java b/src/com/android/settings/cyanogenmod/BootReceiver.java
 index 4311168..1ddc9de 100644
 --- a/src/com/android/settings/cyanogenmod/BootReceiver.java
