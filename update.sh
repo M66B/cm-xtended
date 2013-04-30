@@ -215,6 +215,12 @@ if [ "${init}" = "Y" ]; then
 	${repo} sync
 fi
 
+if [ "${iw}" = "Y" ]; then
+	echo "--- iw"
+else
+	sed -i "/dickychiang/d" ${android}/.repo/local_manifests/cmxtended.xml
+fi
+
 #CMUpdater
 if [ "${updates}" != "Y" ]; then
 	sed -i "/android_packages_apps_CMUpdater/d" ${android}/.repo/local_manifests/cmxtended.xml
