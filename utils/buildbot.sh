@@ -1,11 +1,11 @@
 #!/bin/bash
 {
-	goofull=N
+	goofull=Y
 	goodevices="iyokan mango coconut smultron"
 	gootarget=/home/M66B/public_html/test
 
 	echo "Cleanup"
-	cd ~/android/system
+	cd ~/android/cm10_1
 	if [ "${goofull}" = "Y" ]; then
 		for goodevice in ${goodevices}
 		do
@@ -15,10 +15,10 @@
 	fi
 
 	echo "Xtended"
-	cd ~/Downloads/cm10-fxp-extended
+	cd ~/Downloads/cm-xtended
 	git pull
 	buildbot=Y
-	source ~/Downloads/cm10-fxp-extended/update.sh
+	source ~/Downloads/cm-xtended/update.sh
 
 	echo "Environment"
 	. build/envsetup.sh
