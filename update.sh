@@ -326,7 +326,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 		do_patch kernel_usb_tether.patch
 	fi
 
-	if [ "${kernel_ti_st}" ]; then
+	if [ "${kernel_ti_st}" = "Y" ]; then
 		do_patch kernel_ti_st.patch
 		do_patch kernel_mogami_ti_st.patch
 		do_patch kernel_remove_rfkill.patch
@@ -354,7 +354,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 			#do_replace "# CONFIG_USB_OTG is not set" "CONFIG_USB_OTG=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_USB_OTG_WHITELIST is not set" "CONFIG_USB_OTG_WHITELIST=y" arch/arm/configs/nAa_${device}_defconfig
 
-			if [ "${kernel_ti_st}" ]; then
+			if [ "${kernel_ti_st}" = "Y" ]; then
 				do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
