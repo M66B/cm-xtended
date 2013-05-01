@@ -58,7 +58,7 @@ kernel_fixes=Y
 kernel_underclock=Y
 kernel_hdmi=Y
 kernel_usb_tether=Y
-kernel_ti_st=Y
+kernel_ti_st=N
 kernel_xtended_perm=Y
 
 bootlogo=Y
