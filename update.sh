@@ -211,6 +211,7 @@ fi
 #Local manifest
 echo "*** Local manifest ***"
 mkdir -p ${android}/.repo/local_manifests
+rm -f ${android}/.repo/local_manifests/cmxtended.xml
 cp ${patches}/xtended.xml ${android}/.repo/local_manifests/xtended.xml
 if [ "${init}" = "Y" ]; then
 	cd ${android}
