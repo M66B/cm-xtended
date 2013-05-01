@@ -45,10 +45,10 @@ index edde20f..1875727 100644
 +    <!-- **** Privacy Permission descriptions **** -->
 +
 +    <string name="permlab_receive_kill_task_command">Receive the kill Task command</string>
-+    <string name="permdesc_receive_kill_task_command">Allows an application to receive the kill task command. This prevents that other applications are
++    <string name="permdesc_receive_kill_task_command">Allows an application to receive the kill task command. This prevents that other applications are available to receive it.</string>
 +
 +    <string name="permlab_receive_disable_apps">Receive the disable or enable apps command</string>
-+    <string name="permdesc_receive_disable_apps">Allows an application to receive the disable or enable apps command. This prevents that other applicat
++    <string name="permdesc_receive_disable_apps">Allows an application to receive the disable or enable apps command. This prevents that other applications are available to receive it.</string>
 +
 +    <!-- **** Privacy Permission descriptions **** -->
 +
