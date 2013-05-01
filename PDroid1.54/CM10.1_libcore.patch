@@ -1,6 +1,26 @@
-diff -Npru --exclude=.svn --exclude='.git*' CM10.1/libcore/luni/src/main/java/java/lang/PrivacyInputStream.java pang/libcore/luni/src/main/java/java/lang/PrivacyInputStream.java
---- CM10.1/libcore/luni/src/main/java/java/lang/PrivacyInputStream.java	1969-12-31 16:00:00.000000000 -0800
-+++ pang/libcore/luni/src/main/java/java/lang/PrivacyInputStream.java	2012-02-23 23:17:06.093418937 -0800
+diff --git a/luni/src/main/java/java/lang/ProcessManager.java b/luni/src/main/java/java/lang/ProcessManager.java
+index 28314b7..fa6ef25 100644
+--- a/luni/src/main/java/java/lang/ProcessManager.java
++++ b/luni/src/main/java/java/lang/ProcessManager.java
+@@ -248,7 +248,12 @@ final class ProcessManager {
+             this.pid = pid;
+ 
+             this.errorStream = new ProcessInputStream(err);
+-            this.inputStream = new ProcessInputStream(in);
++            // BEGIN privacy-modified
++            if (PrivacyProcessManager.hasPrivacyPermission("systemLogsSetting", pid))
++                this.inputStream = new ProcessInputStream(in);
++            else
++                this.inputStream = new PrivacyInputStream();
++            // END privacy-modified            
+             this.outputStream = new ProcessOutputStream(out);
+         }
+ 
+diff --git a/luni/src/main/java/java/lang/PrivacyInputStream.java b/luni/src/main/java/java/lang/PrivacyInputStream.java
+new file mode 100644
+index 0000000..4986566
+--- /dev/null
++++ b/luni/src/main/java/java/lang/PrivacyInputStream.java
 @@ -0,0 +1,36 @@
 +package java.lang;
 +
@@ -38,9 +58,11 @@ diff -Npru --exclude=.svn --exclude='.git*' CM10.1/libcore/luni/src/main/java/ja
 +    }
 +    
 +}   
-diff -Npru --exclude=.svn --exclude='.git*' CM10.1/libcore/luni/src/main/java/java/lang/PrivacyProcessManager.java pang/libcore/luni/src/main/java/java/lang/PrivacyProcessManager.java
---- CM10.1/libcore/luni/src/main/java/java/lang/PrivacyProcessManager.java	1969-12-31 16:00:00.000000000 -0800
-+++ pang/libcore/luni/src/main/java/java/lang/PrivacyProcessManager.java	2012-02-23 23:17:06.093418937 -0800
+diff --git a/luni/src/main/java/java/lang/PrivacyProcessManager.java b/luni/src/main/java/java/lang/PrivacyProcessManager.java
+new file mode 100644
+index 0000000..3056a31
+--- /dev/null
++++ b/luni/src/main/java/java/lang/PrivacyProcessManager.java
 @@ -0,0 +1,143 @@
 +package java.lang;
 +
@@ -185,20 +207,3 @@ diff -Npru --exclude=.svn --exclude='.git*' CM10.1/libcore/luni/src/main/java/ja
 +        }
 +    }
 +}
-diff -Npru --exclude=.svn --exclude='.git*' CM10.1/libcore/luni/src/main/java/java/lang/ProcessManager.java pang/libcore/luni/src/main/java/java/lang/ProcessManager.java
---- CM10.1/libcore/luni/src/main/java/java/lang/ProcessManager.java	2012-02-12 10:48:58.867734866 -0800
-+++ pang/libcore/luni/src/main/java/java/lang/ProcessManager.java	2012-02-23 23:17:06.101419408 -0800
-@@ -248,7 +248,12 @@ final class ProcessManager {
-             this.pid = pid;
- 
-             this.errorStream = new ProcessInputStream(err);
--            this.inputStream = new ProcessInputStream(in);
-+            // BEGIN privacy-modified
-+            if (PrivacyProcessManager.hasPrivacyPermission("systemLogsSetting", pid))
-+                this.inputStream = new ProcessInputStream(in);
-+            else
-+                this.inputStream = new PrivacyInputStream();
-+            // END privacy-modified            
-             this.outputStream = new ProcessOutputStream(out);
-         }
- 

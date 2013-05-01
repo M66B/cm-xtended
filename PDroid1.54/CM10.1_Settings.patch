@@ -1,9 +1,10 @@
-diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.mk~' '--exclude=*.orig~' '--exclude=*.txt' '--exclude=*.orig' '--exclude=*.rej' '--exclude=*.latest' '--exclude=*.txt~' '--exclude=*.xml~' '--exclude=*xml.orig~' '--exclude=*.xml.orig' '--exclude=*.patch~' '--exclude=*.patch' '--exclude=*.diff~' '--exclude=*.diff~' /root/CM10.1_ORIG/packages/apps/Settings/AndroidManifest.xml pang/packages/apps/Settings/AndroidManifest.xml
---- /root/CM10.1_ORIG/packages/apps/Settings/AndroidManifest.xml	2013-02-08 18:29:52.840633742 +0545
-+++ pang/packages/apps/Settings/AndroidManifest.xml	2013-02-09 13:25:10.054719078 +0545
-@@ -63,6 +63,16 @@
-     <uses-permission android:name="android.permission.CONFIGURE_WIFI_DISPLAY" />
-     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+diff --git a/AndroidManifest.xml b/AndroidManifest.xml
+index f1a1bde..75d8ec1 100644
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -87,6 +87,16 @@
+         android:permissionGroup="android.permission-group.SUPERUSER"
+         android:protectionLevel="dangerous" />
  
 +    <!-- BEGIN Privacy -->
 +    
@@ -18,7 +19,7 @@ diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.m
      <application android:label="@string/settings_label"
              android:icon="@mipmap/ic_launcher_settings"
              android:taskAffinity=""
-@@ -1624,5 +1634,14 @@
+@@ -1736,5 +1746,14 @@
              </intent-filter>
          </receiver>
  
@@ -33,31 +34,32 @@ diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.m
 +
      </application>
  </manifest>
-diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.mk~' '--exclude=*.orig~' '--exclude=*.txt' '--exclude=*.orig' '--exclude=*.rej' '--exclude=*.latest' '--exclude=*.txt~' '--exclude=*.xml~' '--exclude=*xml.orig~' '--exclude=*.xml.orig' '--exclude=*.patch~' '--exclude=*.patch' '--exclude=*.diff~' '--exclude=*.diff~' /root/CM10.1_ORIG/packages/apps/Settings/res/values/strings.xml pang/packages/apps/Settings/res/values/strings.xml
---- /root/CM10.1_ORIG/packages/apps/Settings/res/values/strings.xml	2013-02-09 13:21:06.691524100 +0545
-+++ pang/packages/apps/Settings/res/values/strings.xml	2013-02-09 13:25:46.108229599 +0545
-@@ -5153,4 +5153,18 @@
-     <string name="cyanogenmod_waiver_body">Changing this setting may be against your state or government laws.\n\nIn selecting \'OK\' below, you acknowledge this warning and waive, indemnify and hold harmless CyanogenMod and its contributors from all legal liabilities.</string>
- 
-     <!-- **** CYANOGENMOD ADDITIONS END **** -->
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+index edde20f..1875727 100644
+--- a/res/values/strings.xml
++++ b/res/values/strings.xml
+@@ -14,6 +14,16 @@
+      limitations under the License.
+ -->
+ <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
++    <!-- **** Privacy Permission descriptions **** -->
 +
++    <string name="permlab_receive_kill_task_command">Receive the kill Task command</string>
++    <string name="permdesc_receive_kill_task_command">Allows an application to receive the kill task command. This prevents that other applications are
++
++    <string name="permlab_receive_disable_apps">Receive the disable or enable apps command</string>
++    <string name="permdesc_receive_disable_apps">Allows an application to receive the disable or enable apps command. This prevents that other applicat
 +
 +    <!-- **** Privacy Permission descriptions **** -->
-+    
-+    <string name="permlab_receive_kill_task_command">Receive the kill Task command</string>
-+    <string name="permdesc_receive_kill_task_command">Allows an application to receive the kill task command. This prevents that other applications are available to receive it.</string>
-+    
-+    <string name="permlab_receive_disable_apps">Receive the disable or enable apps command</string>
-+    <string name="permdesc_receive_disable_apps">Allows an application to receive the disable or enable apps command. This prevents that other applications are available to receive it.</string>
 +
-+     <!-- **** Privacy Permission descriptions **** -->
-+
-+
-+
- </resources>
-diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.mk~' '--exclude=*.orig~' '--exclude=*.txt' '--exclude=*.orig' '--exclude=*.rej' '--exclude=*.latest' '--exclude=*.txt~' '--exclude=*.xml~' '--exclude=*xml.orig~' '--exclude=*.xml.orig' '--exclude=*.patch~' '--exclude=*.patch' '--exclude=*.diff~' '--exclude=*.diff~' /root/CM10.1_ORIG/packages/apps/Settings/src/com/android/settings/privacy/PrivacyReceiver.java pang/packages/apps/Settings/src/com/android/settings/privacy/PrivacyReceiver.java
---- /root/CM10.1_ORIG/packages/apps/Settings/src/com/android/settings/privacy/PrivacyReceiver.java	1970-01-01 05:30:00.000000000 +0530
-+++ pang/packages/apps/Settings/src/com/android/settings/privacy/PrivacyReceiver.java	2013-02-08 14:22:21.204780552 +0545
+     <!-- Strings for Dialog yes button -->
+     <string name="yes">"Yes"</string>
+ 
+diff --git a/src/com/android/settings/privacy/PrivacyReceiver.java b/src/com/android/settings/privacy/PrivacyReceiver.java
+new file mode 100644
+index 0000000..c8054e4
+--- /dev/null
++++ b/src/com/android/settings/privacy/PrivacyReceiver.java
 @@ -0,0 +1,344 @@
 +package com.android.settings.privacy;
 +

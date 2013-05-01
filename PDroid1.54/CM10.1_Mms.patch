@@ -1,6 +1,7 @@
-diff -rupN '--exclude=.svn' '--exclude=.git*' '--exclude=*.java~' '--exclude=*.mk~' '--exclude=*.orig~' '--exclude=*.txt' '--exclude=*.orig' '--exclude=*.rej' '--exclude=*.latest' '--exclude=*.txt~' '--exclude=*.xml~' '--exclude=*xml.orig~' '--exclude=*.xml.orig' /root/CM10.1_ORIG/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java pang/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java
---- /root/CM10.1_ORIG/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java	2013-02-08 18:29:51.929101208 +0545
-+++ pang/packages/apps/Mms/src/com/android/mms/transaction/HttpUtils.java	2013-02-05 01:07:08.738642570 +0545
+diff --git a/src/com/android/mms/transaction/HttpUtils.java b/src/com/android/mms/transaction/HttpUtils.java
+index b6c878c..d7125e5 100644
+--- a/src/com/android/mms/transaction/HttpUtils.java
++++ b/src/com/android/mms/transaction/HttpUtils.java
 @@ -46,6 +46,24 @@ import android.util.Log;
  import com.android.mms.LogTag;
  import com.android.mms.MmsConfig;

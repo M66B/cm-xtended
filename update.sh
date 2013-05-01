@@ -71,7 +71,7 @@ sideload=Y
 #ROM
 
 cellbroadcast=Y
-pdroid=N
+pdroid=Y
 terminfo=Y
 emptydrawer=N
 massstorage=Y
@@ -266,7 +266,7 @@ if [ "${kernel_linaro}" = "Y" ]; then
 fi
 
 #Prebuilts
-if [ "${openpdroid}" = "Y" ]; then
+if [ "${pdroid}" = "Y" ]; then
 	do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid2.0.apk -O -L https://github.com/CollegeDev/PDroid2.0_Manager_Compiled/raw/jellybean-devel/PDroid2.0.apk" ${android}/vendor/cm/get-prebuilts
 	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid2.0.apk:system/app/PDroid2.0.apk" ${android}/vendor/cm/config/common.mk
 fi
@@ -442,16 +442,18 @@ fi
 if [ "${pdroid}" = "Y" ]; then
 	echo "*** PDroid ***"
 
-	cd ${android}
-	do_patch ${patches}/PDroid1.54/CM10.1_build.patch
-	do_patch ${patches}/PDroid1.54/CM10.1_libcore.patch
-	do_patch ${patches}/PDroid1.54/CM10.1_Mms.patch
-	do_patch ${patches}/PDroid1.54/CM10.1_framework.patch
-	do_patch ${patches}/PDroid1.54/CM10.1_Settings.patch
-
-	#TO DO:
-	#- patch Settings fails
-	#- http://forum.xda-developers.com/showpost.php?p=38794149&postcount=711
+	cd ${android}/build
+	do_patch PDroid1.54/CM10.1_build.patch
+	cd ${android}/libcore
+	do_patch PDroid1.54/CM10.1_libcore.patch
+	cd ${android}/packages/apps/Mms
+	do_patch PDroid1.54/CM10.1_Mms.patch
+	cd ${android}/frameworks/base
+	do_patch PDroid1.54/CM10.1_framework.patch
+	cd ${android}/frameworks/opt/telephony
+	do_patch PDroid1.54/CM10.1_telephony.patch
+	cd ${android}/packages/apps/Settings
+	do_patch PDroid1.54/CM10.1_Settings.patch
 
 	mkdir -p ${android}/privacy
 	cp ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy

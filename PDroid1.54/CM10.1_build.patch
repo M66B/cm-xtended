@@ -1,7 +1,8 @@
-diff -Npru --exclude='.git*' CM10.1/build/core/pathmap.mk pang/build/core/pathmap.mk
---- CM10.1/build/core/pathmap.mk	2012-07-13 08:59:33.472884054 -0700
-+++ pang/build/core/pathmap.mk	2012-07-13 10:18:29.349669133 -0700
-@@ -84,6 +84,7 @@ JNI_H_INCLUDE := $(call include-path-for
+diff --git a/core/pathmap.mk b/core/pathmap.mk
+index 3f38a6b..f4f9671 100644
+--- a/core/pathmap.mk
++++ b/core/pathmap.mk
+@@ -81,6 +81,7 @@ JNI_H_INCLUDE := $(call include-path-for,libnativehelper)/nativehelper
  # is so common and the other framework libraries can have mutual
  # interdependencies.
  #
@@ -9,7 +10,7 @@ diff -Npru --exclude='.git*' CM10.1/build/core/pathmap.mk pang/build/core/pathma
  FRAMEWORKS_BASE_SUBDIRS := \
  	$(addsuffix /java, \
  	    core \
-@@ -95,6 +96,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
+@@ -92,6 +93,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
  	    media/mca/filterpacks \
  	    drm \
  	    opengl \
@@ -17,16 +18,18 @@ diff -Npru --exclude='.git*' CM10.1/build/core/pathmap.mk pang/build/core/pathma
  	    sax \
  	    telephony \
  	    wifi \
-@@ -102,6 +104,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
- 	    icu4j \
+@@ -100,6 +102,7 @@ FRAMEWORKS_BASE_SUBDIRS := \
  	    voip \
+ 	    fmradio \
  	 )
 +# END privacy-added: privacy
  
  #
  # A version of FRAMEWORKS_BASE_SUBDIRS that is expanded to full paths from
---- CM10.1_ORIG/build/target/product/core.mk	2013-02-08 18:28:09.441660294 +0545
-+++ pang/build/target/product/core.mk	2013-01-16 01:12:45.258540952 +0545
+diff --git a/target/product/core.mk b/target/product/core.mk
+index f23646a..8c4e44d 100644
+--- a/target/product/core.mk
++++ b/target/product/core.mk
 @@ -18,6 +18,7 @@ PRODUCT_BRAND := generic
  PRODUCT_DEVICE := generic
  PRODUCT_NAME := core
@@ -41,8 +44,8 @@ diff -Npru --exclude='.git*' CM10.1/build/core/pathmap.mk pang/build/core/pathma
      MediaProvider \
 +    PDroid \
      PackageInstaller \
-     PhotoTable \
      PicoTts \
+     SettingsProvider \
 @@ -130,6 +132,8 @@ PRODUCT_PACKAGES += \
      zoneinfo.idx \
      zoneinfo.version
@@ -52,10 +55,11 @@ diff -Npru --exclude='.git*' CM10.1/build/core/pathmap.mk pang/build/core/pathma
  PRODUCT_COPY_FILES += \
      system/core/rootdir/init.usb.rc:root/init.usb.rc \
      system/core/rootdir/init.trace.rc:root/init.trace.rc \
-Binary files CM10/build/target/product/security/privacy.pk8 and pang/build/target/product/security/privacy.pk8 differ
-diff -Npru --exclude='.git*' CM10.1/build/target/product/security/privacy.x509.pem pang/build/target/product/security/privacy.x509.pem
---- CM10.1/build/target/product/security/privacy.x509.pem	1969-12-31 16:00:00.000000000 -0800
-+++ pang/build/target/product/security/privacy.x509.pem	2012-07-13 10:18:29.356671097 -0700
+diff --git a/target/product/security/privacy.x509.pem b/target/product/security/privacy.x509.pem
+new file mode 100644
+index 0000000..28279a0
+--- /dev/null
++++ b/target/product/security/privacy.x509.pem
 @@ -0,0 +1,20 @@
 +-----BEGIN CERTIFICATE-----
 +MIIDNDCCAhwCCQCXWkdOAj3rWTANBgkqhkiG9w0BAQUFADBcMQswCQYDVQQGEwJE
