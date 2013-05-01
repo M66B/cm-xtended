@@ -3,6 +3,10 @@
 	<!-- Build iw from source -->
 	<project name="dickychiang/iw" path="external/iw" remote="github" revision="android" />
 
+	<!-- Replaces -->
+	<remove-project name="mikeNG/msm7x30-3.0.x-nAa" />
+	<project name="nobodyAtall/msm7x30-3.0.x-nAa" path="kernel/semc/msm7x30" revision="M7630AABBQMLZA404033I-nAa-master" />
+
 	<!-- Removes -->
 	<remove-project name="CyanogenMod/android_packages_apps_CMUpdater" />
 </manifest>

@@ -211,7 +211,7 @@ fi
 #Local manifest
 echo "*** Local manifest ***"
 mkdir -p ${android}/.repo/local_manifests
-cp ${patches}/cmxtended.xml ${android}/.repo/local_manifests/cmxtended.xml
+cp ${patches}/xtended.xml ${android}/.repo/local_manifests/xtended.xml
 if [ "${init}" = "Y" ]; then
 	cd ${android}
 	${repo} sync
@@ -220,12 +220,12 @@ fi
 if [ "${iw}" = "Y" ]; then
 	echo "--- iw"
 else
-	sed -i "/dickychiang/d" ${android}/.repo/local_manifests/cmxtended.xml
+	sed -i "/dickychiang/d" ${android}/.repo/local_manifests/xtended.xml
 fi
 
 #CMUpdater
 if [ "${updates}" != "Y" ]; then
-	sed -i "/android_packages_apps_CMUpdater/d" ${android}/.repo/local_manifests/cmxtended.xml
+	sed -i "/android_packages_apps_CMUpdater/d" ${android}/.repo/local_manifests/xtended.xml
 fi
 
 #Synchronize
