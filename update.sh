@@ -80,6 +80,7 @@ ssh=Y
 boost_pulse=Y
 iw=Y
 mmsfix=Y
+fmradio=Y
 
 #Local configuration
 if [ -f ~/.cm101xtended ]; then
@@ -292,6 +293,21 @@ if [ "${onecorebuild}" = "Y" ]; then
 	cd ${android}/build
 	do_patch onecore.patch
 fi
+
+#--- merge requests ---
+
+echo "*** Merge requests ***"
+#http://review.cyanogenmod.org/#/c/32906/
+cd ${android}/frameworks/av/
+git fetch http://review.cyanogenmod.org/CyanogenMod/android_frameworks_av refs/changes/06/32906/2 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+#http://review.cyanogenmod.org/#/c/28336/
+cd ${android}/packages/apps/LegacyCamera/
+git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_LegacyCamera refs/changes/36/28336/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+#http://review.cyanogenmod.org/#/c/34989/
+cd ${android}/hardware/qcom/audio-caf
+git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_qcom_audio-caf refs/changes/89/34989/5 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 
 #--- kernel ---
 
@@ -530,6 +546,16 @@ if [ "${mmsfix}" = "Y" ]; then
 	echo "*** MMS fix ***"
 	cd ${android}/packages/apps/Mms
 	do_patch mms_cursor.patch
+fi
+
+#FM radio
+if [ "${fmradio}" = "Y" ]; then
+	echo "*** FM radio ***"
+	do_append "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+	do_append "BOARD_HAVE_FM_RADIO_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+
+	do_append "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+	do_append "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 fi
 
 #Custom patches
