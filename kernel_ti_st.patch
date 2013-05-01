@@ -193,7 +193,7 @@ index 54c91ff..b90a224 100644
  	st_gdata->protos_registered = 0;
  	spin_unlock_irqrestore(&st_gdata->lock, flags);
 diff --git a/drivers/misc/ti-st/st_kim.c b/drivers/misc/ti-st/st_kim.c
-index 38fd2f0..7fb920d 100644
+index 38fd2f0..34e1507 100644
 --- a/drivers/misc/ti-st/st_kim.c
 +++ b/drivers/misc/ti-st/st_kim.c
 @@ -35,6 +35,7 @@
@@ -333,7 +333,7 @@ index 38fd2f0..7fb920d 100644
  	return;
  }
  
-@@ -434,11 +457,17 @@ long st_kim_start(void *kim_data)
+@@ -434,16 +457,17 @@ long st_kim_start(void *kim_data)
  {
  	long err = 0;
  	long retry = POR_RETRY_COUNT;
@@ -344,14 +344,19 @@ index 38fd2f0..7fb920d 100644
 +	pdata = kim_gdata->kim_pdev->dev.platform_data;
  
  	do {
+-		/* Configure BT nShutdown to HIGH state */
+-		gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
+-		mdelay(5);	/* FIXME: a proper toggle */
+-		gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
+-		mdelay(100);
 +		/* platform specific enabling code here */
 +		if (pdata->chip_enable)
 +			pdata->chip_enable(kim_gdata);
 +
- 		/* Configure BT nShutdown to HIGH state */
- 		gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
- 		mdelay(5);	/* FIXME: a proper toggle */
-@@ -452,26 +481,23 @@ long st_kim_start(void *kim_data)
+ 		/* re-initialize the completion */
+ 		INIT_COMPLETION(kim_gdata->ldisc_installed);
+ 		/* send notification to UIM */
+@@ -452,26 +476,23 @@ long st_kim_start(void *kim_data)
  		sysfs_notify(&kim_gdata->kim_pdev->dev.kobj,
  				NULL, "install");
  		/* wait for ldisc to be installed */
@@ -389,7 +394,7 @@ index 38fd2f0..7fb920d 100644
  				continue;
  			} else {	/* on success don't retry */
  				break;
-@@ -482,19 +508,31 @@ long st_kim_start(void *kim_data)
+@@ -482,19 +503,31 @@ long st_kim_start(void *kim_data)
  }
  
  /**
@@ -426,7 +431,7 @@ index 38fd2f0..7fb920d 100644
  
  	/* send uninstall notification to UIM */
  	pr_info("ldisc_install = 0");
-@@ -502,11 +540,11 @@ long st_kim_stop(void *kim_data)
+@@ -502,19 +535,16 @@ long st_kim_stop(void *kim_data)
  	sysfs_notify(&kim_gdata->kim_pdev->dev.kobj, NULL, "install");
  
  	/* wait for ldisc to be un-installed */
@@ -440,19 +445,19 @@ index 38fd2f0..7fb920d 100644
 +		err = -ETIMEDOUT;
  	}
  
- 	/* By default configure BT nShutdown to LOW state */
-@@ -515,6 +553,10 @@ long st_kim_stop(void *kim_data)
- 	gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
- 	mdelay(1);
- 	gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
-+
+-	/* By default configure BT nShutdown to LOW state */
+-	gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
+-	mdelay(1);
+-	gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
+-	mdelay(1);
+-	gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
 +	/* platform specific disable */
 +	if (pdata->chip_disable)
 +		pdata->chip_disable(kim_gdata);
  	return err;
  }
  
-@@ -545,6 +587,28 @@ static ssize_t show_install(struct device *dev,
+@@ -545,6 +575,28 @@ static ssize_t show_install(struct device *dev,
  	return sprintf(buf, "%d\n", kim_data->ldisc_install);
  }
  
@@ -481,7 +486,7 @@ index 38fd2f0..7fb920d 100644
  static ssize_t show_dev_name(struct device *dev,
  		struct device_attribute *attr, char *buf)
  {
-@@ -571,10 +635,18 @@ static struct kobj_attribute ldisc_install =
+@@ -571,10 +623,18 @@ static struct kobj_attribute ldisc_install =
  __ATTR(install, 0444, (void *)show_install, NULL);
  
  static struct kobj_attribute uart_dev_name =
@@ -500,7 +505,7 @@ index 38fd2f0..7fb920d 100644
  
  static struct kobj_attribute uart_flow_cntrl =
  __ATTR(flow_cntrl, 0444, (void *)show_flow_cntrl, NULL);
-@@ -643,12 +715,12 @@ static const struct file_operations list_debugfs_fops = {
+@@ -643,12 +703,12 @@ static const struct file_operations list_debugfs_fops = {
   * board-*.c file
   */
  
@@ -515,7 +520,7 @@ index 38fd2f0..7fb920d 100644
  
  	if ((pdev->id != -1) && (pdev->id < MAX_ST_DEVICES)) {
  		/* multiple devices could exist */
-@@ -665,27 +737,28 @@ static int kim_probe(struct platform_device *pdev)
+@@ -665,38 +725,25 @@ static int kim_probe(struct platform_device *pdev)
  	}
  	dev_set_drvdata(&pdev->dev, kim_gdata);
  
@@ -531,29 +536,23 @@ index 38fd2f0..7fb920d 100644
  	/* refer to itself */
  	kim_gdata->core_data->kim_data = kim_gdata;
  
- 	/* Claim the chip enable nShutdown gpio from the system */
- 	kim_gdata->nshutdown = pdata->nshutdown_gpio;
+-	/* Claim the chip enable nShutdown gpio from the system */
+-	kim_gdata->nshutdown = pdata->nshutdown_gpio;
 -	status = gpio_request(kim_gdata->nshutdown, "kim");
 -	if (unlikely(status)) {
-+	err = gpio_request(kim_gdata->nshutdown, "kim");
-+	if (unlikely(err)) {
- 		pr_err(" gpio %ld request failed ", kim_gdata->nshutdown);
+-		pr_err(" gpio %ld request failed ", kim_gdata->nshutdown);
 -		return status;
-+		return err;
- 	}
- 
- 	/* Configure nShutdown GPIO as output=0 */
+-	}
+-
+-	/* Configure nShutdown GPIO as output=0 */
 -	status = gpio_direction_output(kim_gdata->nshutdown, 0);
 -	if (unlikely(status)) {
-+	err = gpio_direction_output(kim_gdata->nshutdown, 0);
-+	if (unlikely(err)) {
- 		pr_err(" unable to configure gpio %ld", kim_gdata->nshutdown);
+-		pr_err(" unable to configure gpio %ld", kim_gdata->nshutdown);
 -		return status;
-+		return err;
- 	}
+-	}
  	/* get reference of pdev for request_firmware
  	 */
-@@ -693,10 +766,10 @@ static int kim_probe(struct platform_device *pdev)
+ 	kim_gdata->kim_pdev = pdev;
  	init_completion(&kim_gdata->kim_rcvd);
  	init_completion(&kim_gdata->ldisc_installed);
  
@@ -567,7 +566,7 @@ index 38fd2f0..7fb920d 100644
  	}
  
  	/* copying platform data */
-@@ -708,8 +781,8 @@ static int kim_probe(struct platform_device *pdev)
+@@ -708,8 +755,8 @@ static int kim_probe(struct platform_device *pdev)
  	kim_debugfs_dir = debugfs_create_dir("ti-st", NULL);
  	if (IS_ERR(kim_debugfs_dir)) {
  		pr_err(" debugfs entries creation failed ");
@@ -578,7 +577,7 @@ index 38fd2f0..7fb920d 100644
  	}
  
  	debugfs_create_file("version", S_IRUGO, kim_debugfs_dir,
-@@ -718,6 +791,17 @@ static int kim_probe(struct platform_device *pdev)
+@@ -718,22 +765,25 @@ static int kim_probe(struct platform_device *pdev)
  				kim_gdata, &list_debugfs_fops);
  	pr_info(" debugfs entries created ");
  	return 0;
@@ -596,7 +595,23 @@ index 38fd2f0..7fb920d 100644
  }
  
  static int kim_remove(struct platform_device *pdev)
-@@ -746,7 +830,7 @@ static int kim_remove(struct platform_device *pdev)
+ {
+-	/* free the GPIOs requested */
+-	struct ti_st_plat_data	*pdata = pdev->dev.platform_data;
+ 	struct kim_data_s	*kim_gdata;
+ 
+ 	kim_gdata = dev_get_drvdata(&pdev->dev);
+ 
+-	/* Free the Bluetooth/FM/GPIO
+-	 * nShutdown gpio from the system
+-	 */
+-	gpio_free(pdata->nshutdown_gpio);
+-	pr_info("nshutdown GPIO Freed");
+-
+ 	debugfs_remove_recursive(kim_debugfs_dir);
+ 	sysfs_remove_group(&pdev->dev.kobj, &uim_attr_grp);
+ 	pr_info("sysfs entries removed");
+@@ -746,7 +796,7 @@ static int kim_remove(struct platform_device *pdev)
  	return 0;
  }
  
@@ -605,7 +620,7 @@ index 38fd2f0..7fb920d 100644
  {
  	struct ti_st_plat_data	*pdata = pdev->dev.platform_data;
  
-@@ -756,7 +840,7 @@ int kim_suspend(struct platform_device *pdev, pm_message_t state)
+@@ -756,7 +806,7 @@ int kim_suspend(struct platform_device *pdev, pm_message_t state)
  	return -EOPNOTSUPP;
  }
  
@@ -614,7 +629,7 @@ index 38fd2f0..7fb920d 100644
  {
  	struct ti_st_plat_data	*pdata = pdev->dev.platform_data;
  
-@@ -779,19 +863,24 @@ static struct platform_driver kim_platform_driver = {
+@@ -779,19 +829,24 @@ static struct platform_driver kim_platform_driver = {
  	},
  };
  
@@ -706,10 +721,10 @@ index 3f24951..93b4d67 100644
  /**********************************************************************/
 diff --git a/drivers/misc/ti-st/tty_hci.c b/drivers/misc/ti-st/tty_hci.c
 new file mode 100644
-index 0000000..591b0be
+index 0000000..c5b147e
 --- /dev/null
 +++ b/drivers/misc/ti-st/tty_hci.c
-@@ -0,0 +1,543 @@
+@@ -0,0 +1,549 @@
 +/*
 + *  TTY emulation for user-space Bluetooth stacks over HCI-H4
 + *  Copyright (C) 2011-2012 Texas Instruments
@@ -878,7 +893,7 @@ index 0000000..591b0be
 +
 +		if (err != -EINPROGRESS) {
 +			pr_err("st_register failed %d", err);
-+			return err;
++			goto error;
 +		}
 +
 +		/* ST is busy with either protocol
@@ -893,7 +908,8 @@ index 0000000..591b0be
 +			pr_err("Timeout(%d sec),didn't get reg "
 +					"completion signal from ST",
 +					BT_REGISTER_TIMEOUT / 1000);
-+			return -ETIMEDOUT;
++			err = -ETIMEDOUT;
++			goto error;
 +		}
 +
 +		/* Is ST registration callback
@@ -901,7 +917,8 @@ index 0000000..591b0be
 +		if (hst->reg_status != 0) {
 +			pr_err("ST registration completed with invalid "
 +					"status %d", hst->reg_status);
-+			return -EAGAIN;
++			err = -EAGAIN;
++			goto error;
 +		}
 +
 +done:
@@ -924,6 +941,10 @@ index 0000000..591b0be
 +	init_waitqueue_head(&hst->data_q);
 +
 +	return 0;
++
++error:
++	kfree(hst);
++	return err;
 +}
 +
 +/** hci_tty_release Function
@@ -1253,50 +1274,6 @@ index 0000000..591b0be
 +
 +MODULE_AUTHOR("Pavan Savoy <pavan_savoy@ti.com>");
 +MODULE_LICENSE("GPL");
-diff --git a/drivers/misc/ti-st/tty_hci.c b/drivers/misc/ti-st/tty_hci.c
-index 591b0be..c5b147e 100644
---- a/drivers/misc/ti-st/tty_hci.c
-+++ b/drivers/misc/ti-st/tty_hci.c
-@@ -166,7 +166,7 @@ int hci_tty_open(struct inode *inod, struct file *file)
- 
- 		if (err != -EINPROGRESS) {
- 			pr_err("st_register failed %d", err);
--			return err;
-+			goto error;
- 		}
- 
- 		/* ST is busy with either protocol
-@@ -181,7 +181,8 @@ int hci_tty_open(struct inode *inod, struct file *file)
- 			pr_err("Timeout(%d sec),didn't get reg "
- 					"completion signal from ST",
- 					BT_REGISTER_TIMEOUT / 1000);
--			return -ETIMEDOUT;
-+			err = -ETIMEDOUT;
-+			goto error;
- 		}
- 
- 		/* Is ST registration callback
-@@ -189,7 +190,8 @@ int hci_tty_open(struct inode *inod, struct file *file)
- 		if (hst->reg_status != 0) {
- 			pr_err("ST registration completed with invalid "
- 					"status %d", hst->reg_status);
--			return -EAGAIN;
-+			err = -EAGAIN;
-+			goto error;
- 		}
- 
- done:
-@@ -212,6 +214,10 @@ done:
- 	init_waitqueue_head(&hst->data_q);
- 
- 	return 0;
-+
-+error:
-+	kfree(hst);
-+	return err;
- }
- 
- /** hci_tty_release Function
 diff --git a/include/linux/ti_wilink_st.h b/include/linux/ti_wilink_st.h
 index b004e55..932b763 100644
 --- a/include/linux/ti_wilink_st.h
