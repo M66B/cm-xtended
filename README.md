@@ -1,5 +1,5 @@
-CM extended ROM/kernel patches
-==============================
+CM10.1 extended ROM/kernel patches
+==================================
 
 **This is a work in progress**
 
