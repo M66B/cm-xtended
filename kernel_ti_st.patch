@@ -193,7 +193,7 @@ index 54c91ff..b90a224 100644
  	st_gdata->protos_registered = 0;
  	spin_unlock_irqrestore(&st_gdata->lock, flags);
 diff --git a/drivers/misc/ti-st/st_kim.c b/drivers/misc/ti-st/st_kim.c
-index 38fd2f0..7fb920d 100644
+index 38fd2f0..e06710e 100644
 --- a/drivers/misc/ti-st/st_kim.c
 +++ b/drivers/misc/ti-st/st_kim.c
 @@ -35,6 +35,7 @@
@@ -515,7 +515,7 @@ index 38fd2f0..7fb920d 100644
  
  	if ((pdev->id != -1) && (pdev->id < MAX_ST_DEVICES)) {
  		/* multiple devices could exist */
-@@ -665,27 +737,28 @@ static int kim_probe(struct platform_device *pdev)
+@@ -665,10 +737,11 @@ static int kim_probe(struct platform_device *pdev)
  	}
  	dev_set_drvdata(&pdev->dev, kim_gdata);
  
@@ -530,29 +530,6 @@ index 38fd2f0..7fb920d 100644
  	}
  	/* refer to itself */
  	kim_gdata->core_data->kim_data = kim_gdata;
- 
- 	/* Claim the chip enable nShutdown gpio from the system */
- 	kim_gdata->nshutdown = pdata->nshutdown_gpio;
--	status = gpio_request(kim_gdata->nshutdown, "kim");
--	if (unlikely(status)) {
-+	err = gpio_request(kim_gdata->nshutdown, "kim");
-+	if (unlikely(err)) {
- 		pr_err(" gpio %ld request failed ", kim_gdata->nshutdown);
--		return status;
-+		return err;
- 	}
- 
- 	/* Configure nShutdown GPIO as output=0 */
--	status = gpio_direction_output(kim_gdata->nshutdown, 0);
--	if (unlikely(status)) {
-+	err = gpio_direction_output(kim_gdata->nshutdown, 0);
-+	if (unlikely(err)) {
- 		pr_err(" unable to configure gpio %ld", kim_gdata->nshutdown);
--		return status;
-+		return err;
- 	}
- 	/* get reference of pdev for request_firmware
- 	 */
 @@ -693,10 +766,10 @@ static int kim_probe(struct platform_device *pdev)
  	init_completion(&kim_gdata->kim_rcvd);
  	init_completion(&kim_gdata->ldisc_installed);
@@ -706,10 +683,10 @@ index 3f24951..93b4d67 100644
  /**********************************************************************/
 diff --git a/drivers/misc/ti-st/tty_hci.c b/drivers/misc/ti-st/tty_hci.c
 new file mode 100644
-index 0000000..591b0be
+index 0000000..c5b147e
 --- /dev/null
 +++ b/drivers/misc/ti-st/tty_hci.c
-@@ -0,0 +1,543 @@
+@@ -0,0 +1,549 @@
 +/*
 + *  TTY emulation for user-space Bluetooth stacks over HCI-H4
 + *  Copyright (C) 2011-2012 Texas Instruments
@@ -878,7 +855,7 @@ index 0000000..591b0be
 +
 +		if (err != -EINPROGRESS) {
 +			pr_err("st_register failed %d", err);
-+			return err;
++			goto error;
 +		}
 +
 +		/* ST is busy with either protocol
@@ -893,7 +870,8 @@ index 0000000..591b0be
 +			pr_err("Timeout(%d sec),didn't get reg "
 +					"completion signal from ST",
 +					BT_REGISTER_TIMEOUT / 1000);
-+			return -ETIMEDOUT;
++			err = -ETIMEDOUT;
++			goto error;
 +		}
 +
 +		/* Is ST registration callback
@@ -901,7 +879,8 @@ index 0000000..591b0be
 +		if (hst->reg_status != 0) {
 +			pr_err("ST registration completed with invalid "
 +					"status %d", hst->reg_status);
-+			return -EAGAIN;
++			err = -EAGAIN;
++			goto error;
 +		}
 +
 +done:
@@ -924,6 +903,10 @@ index 0000000..591b0be
 +	init_waitqueue_head(&hst->data_q);
 +
 +	return 0;
++
++error:
++	kfree(hst);
++	return err;
 +}
 +
 +/** hci_tty_release Function
@@ -1253,50 +1236,6 @@ index 0000000..591b0be
 +
 +MODULE_AUTHOR("Pavan Savoy <pavan_savoy@ti.com>");
 +MODULE_LICENSE("GPL");
-diff --git a/drivers/misc/ti-st/tty_hci.c b/drivers/misc/ti-st/tty_hci.c
-index 591b0be..c5b147e 100644
---- a/drivers/misc/ti-st/tty_hci.c
-+++ b/drivers/misc/ti-st/tty_hci.c
-@@ -166,7 +166,7 @@ int hci_tty_open(struct inode *inod, struct file *file)
- 
- 		if (err != -EINPROGRESS) {
- 			pr_err("st_register failed %d", err);
--			return err;
-+			goto error;
- 		}
- 
- 		/* ST is busy with either protocol
-@@ -181,7 +181,8 @@ int hci_tty_open(struct inode *inod, struct file *file)
- 			pr_err("Timeout(%d sec),didn't get reg "
- 					"completion signal from ST",
- 					BT_REGISTER_TIMEOUT / 1000);
--			return -ETIMEDOUT;
-+			err = -ETIMEDOUT;
-+			goto error;
- 		}
- 
- 		/* Is ST registration callback
-@@ -189,7 +190,8 @@ int hci_tty_open(struct inode *inod, struct file *file)
- 		if (hst->reg_status != 0) {
- 			pr_err("ST registration completed with invalid "
- 					"status %d", hst->reg_status);
--			return -EAGAIN;
-+			err = -EAGAIN;
-+			goto error;
- 		}
- 
- done:
-@@ -212,6 +214,10 @@ done:
- 	init_waitqueue_head(&hst->data_q);
- 
- 	return 0;
-+
-+error:
-+	kfree(hst);
-+	return err;
- }
- 
- /** hci_tty_release Function
 diff --git a/include/linux/ti_wilink_st.h b/include/linux/ti_wilink_st.h
 index b004e55..932b763 100644
 --- a/include/linux/ti_wilink_st.h
