@@ -363,7 +363,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 	if [ "${kernel_ti_st}" = "Y" ]; then
 		do_patch kernel_ti_st.patch
 		do_patch kernel_mogami_ti_st.patch
-		#do_patch kernel_mogami_ti_st_suspend.patch
+		do_patch kernel_mogami_ti_st_suspend.patch
 		do_patch kernel_remove_rfkill.patch
 		do_patch kernel_uhid.patch
 	fi
