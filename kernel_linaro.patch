@@ -25,7 +25,7 @@ index 535dfae..f5739f3 100644
  
  # Read KERNELRELEASE from include/config/kernel.release (if it exists)
 diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-index 2cd81c8..3f5d1ee 100644
+index 2cd81c8..8c8de2c 100644
 --- a/arch/arm/boot/compressed/Makefile
 +++ b/arch/arm/boot/compressed/Makefile
 @@ -5,6 +5,7 @@
@@ -68,6 +68,15 @@ index 2cd81c8..3f5d1ee 100644
  
  # Make sure files are removed during clean
  extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S $(libfdt) $(libfdt_hdrs)
+@@ -117,7 +125,7 @@ KBUILD_CFLAGS = $(subst -pg, , $(ORIG_CFLAGS))
+ endif
+ 
+ ccflags-y := -fpic -fno-builtin -I$(obj)
+-asflags-y := -Wa,-march=all
++asflags-y := -Wa,-march=armv7-a$(plus_sec)
+ 
+ # Supply kernel BSS size to the decompressor via a linker symbol.
+ SIZEBIN := $(if $(shell which $(CROSS_COMPILE)size),$(CROSS_COMPILE)size,size)
 @@ -140,6 +148,7 @@ LDFLAGS_vmlinux += -X
  LDFLAGS_vmlinux += -T
  
