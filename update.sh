@@ -53,7 +53,7 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 #bootimage
 
 kernel_mods=Y
-kernel_linaro=N
+kernel_linaro=Y
 kernel_fixes=Y
 kernel_clock=Y
 kernel_underclock=N
@@ -175,9 +175,9 @@ do_deldir() {
 }
 
 do_copy() {
-	cp $1 $2 $3
+	cp $1 $2
 	if [ $? -ne 0 ]; then
-		echo "!!! Error copying $1 $2 $3"
+		echo "!!! Error copying $1 to $2"
 		exit
 	fi
 }
@@ -280,7 +280,7 @@ if [ "${kernel_linaro}" = "Y" ]; then
 		tar -jxf ${linaro_dl}
 		mkdir ${linaro_dir}
 		echo "--- Installing"
-		do_copy -R ./android-toolchain-eabi/* ${linaro_dir}
+		cp -R ./android-toolchain-eabi/* ${linaro_dir}
 	fi
 fi
 
