@@ -53,7 +53,7 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 #bootimage
 
 kernel_mods=Y
-kernel_linaro=Y
+kernel_linaro=N
 kernel_fixes=Y
 kernel_clock=Y
 kernel_underclock=N
