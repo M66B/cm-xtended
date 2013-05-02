@@ -7,9 +7,8 @@ Building
 --------
 
 0. Make sure you have at least 25 GB of free disk space
-1. Setup the build environment as explained [here](http://forum.xda-developers.com/showthread.php?t=2164696)
-2. Run the command: cd ~/Downloads && git clone https://github.com/M66B/cm-xtended.git
-3. Run the command: cd ~/Downloads/cm-xtended/ && . update.sh init
+1. Run the command: cd ~/Downloads && git clone https://github.com/M66B/cm-xtended.git
+2. Run the command: cd ~/Downloads/cm-xtended/ && . update.sh init
 
 The script resets your build environment to pristine state and applies the provided patches for the extended ROM/kernel.
 

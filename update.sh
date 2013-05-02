@@ -173,11 +173,28 @@ do_deldir() {
 	fi
 }
 
+do_copy() {
+	cp $1 $2 $3
+	if [ $? -ne 0 ]; then
+		echo "!!! Error copying $1 $2 $3"
+		exit
+	fi
+}
+
 #Headless
 mkdir -p ~/Downloads
 
 #Cleanup
 echo "*** Cleanup ***"
+
+#Replaced/removed projects
+if [ "${init}" = "Y" ]; then
+	do_deldir ${android}/kernel/semc/msm7x30
+	do_deldir ${android}/packages/apps/CMUpdater
+
+	do_deldir ${android}/.repo/projects/kernel/semc/msm7x30.git
+	do_deldir ${android}/.repo/projects/packages/apps/CMUpdater.git
+fi
 
 #PDroid
 if [ "${pdroid}" = "Y" ]; then
@@ -188,35 +205,33 @@ fi
 
 for device in ${devices}
 do
-	#ROM
-	if [ -d "${android}/out/target/product/${device}/system" ]; then
-		rm -f ${android}/out/target/product/${device}/system/build.prop
-		rm -f ${android}/out/target/product/${device}/system/lib/modules/*
-	fi
-
 	#kernel
 	do_deldir ${android}/out/target/product/${device}/obj/KERNEL_OBJ/
 	if [ -d "${android}/out/target/product/${device}" ]; then
 		cd ${android}/out/target/product/${device}/
 		rm -f ./kernel ./*.img ./*.cpio ./*.fs
 	fi
+
+	#ROM
+	if [ -d "${android}/out/target/product/${device}/system" ]; then
+		rm -f ${android}/out/target/product/${device}/system/build.prop
+		rm -f ${android}/out/target/product/${device}/system/lib/modules/*
+	fi
 done
 
-#Replaced projects
+#Initialize
 if [ "${init}" = "Y" ]; then
-	do_deldir ${android}/packages/apps/CMUpdater
-	do_deldir ${android}/.repo/projects/packages/apps/CMUpdater.git
+	cd ${android}
+	repo init -u git://github.com/CyanogenMod/android.git -b cm-10.1
 fi
 
 #Local manifest
 echo "*** Local manifest ***"
-mkdir -p ${android}/.repo/local_manifests
-rm -f ${android}/.repo/local_manifests/cmxtended.xml
-cp ${patches}/xtended.xml ${android}/.repo/local_manifests/xtended.xml
-if [ "${init}" = "Y" ]; then
-	cd ${android}
-	${repo} sync
-fi
+lmanifests=${android}/.repo/local_manifests
+mkdir -p ${lmanifests}
+curl https://raw.github.com/semc7x30/local_manifests/master/semc.xml >${lmanifests}/semc.xml
+rm -f ${lmanifests}/cmxtended.xml
+do_copy ${patches}/xtended.xml ${lmanifests}/xtended.xml
 
 if [ "${iw}" = "Y" ]; then
 	echo "--- iw"
@@ -232,9 +247,11 @@ fi
 #Synchronize
 echo "*** Repo sync ***"
 cd ${android}
-${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
-if [ $? -ne 0 ]; then
-	exit
+if [ "${init}" != "Y" ]; then
+	${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
+	if [ $? -ne 0 ]; then
+		exit
+	fi
 fi
 ${repo} sync
 if [ $? -ne 0 ]; then
@@ -262,7 +279,7 @@ if [ "${kernel_linaro}" = "Y" ]; then
 		tar -jxf ${linaro_dl}
 		mkdir ${linaro_dir}
 		echo "--- Installing"
-		cp -R ./android-toolchain-eabi/* ${linaro_dir}
+		do_copy -R ./android-toolchain-eabi/* ${linaro_dir}
 	fi
 fi
 
@@ -457,7 +474,7 @@ if [ "${pdroid}" = "Y" ]; then
 	do_patch PDroid1.54/CM10.1_Settings.patch
 
 	mkdir -p ${android}/privacy
-	cp ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy
+	do_copy ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy
 	do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
 fi
 
