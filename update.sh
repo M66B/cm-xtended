@@ -55,7 +55,8 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 kernel_mods=Y
 kernel_linaro=N
 kernel_fixes=Y
-kernel_underclock=Y
+kernel_clock=Y
+kernel_underclock=N
 kernel_hdmi=Y
 kernel_usb_tether=Y
 kernel_ti_st=Y
@@ -347,7 +348,13 @@ if [ "${kernel_mods}" = "Y" ]; then
 		do_patch kernel_fixes.patch
 	fi
 
+	if [ "${kernel_clock}" = "Y" ]; then
+		do_patch kernel_clock.patch
+		kernel_underclock=N
+	fi
+
 	if [ "${kernel_underclock}" = "Y" ]; then
+		#legacy
 		do_patch kernel_underclock.patch
 	fi
 
