@@ -1,49 +1,64 @@
-
-<!-- saved from url=(0109)https://github.com/PolishBloodProject/msm7x30-3.0.x-nAa/commit/afaed4987354e471a7134d19a37adb364cdc5d68.patch -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"></style></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">From afaed4987354e471a7134d19a37adb364cdc5d68 Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Przemys=C5=82aw=20B=C5=82aszk=C3=B3w?=
- &lt;pblaszkow5@gmail.com&gt;
-Date: Thu, 2 May 2013 12:08:29 +0200
-Subject: [PATCH] Fix kim device suspend error
-
----
- arch/arm/mach-msm/board-semc_mogami.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/arch/arm/mach-msm/board-semc_mogami.c b/arch/arm/mach-msm/board-semc_mogami.c
-index 3dcfbb9..284ca5a 100644
---- a/arch/arm/mach-msm/board-semc_mogami.c
-+++ b/arch/arm/mach-msm/board-semc_mogami.c
-@@ -5326,6 +5326,19 @@ static int bluetooth_power(int on)
- 	return 0;
+--- a/arch/arm/mach-msm/board-semc_mogami.c	2013-05-02 17:07:57.347303297 +0200
++++ b/arch/arm/mach-msm/board-semc_mogami.c	2013-05-02 17:27:00.000000000 +0200
+@@ -5327,20 +5327,50 @@ static struct wake_lock st_wk_lock;
+ 
+ static int plat_chip_enable(struct kim_data_s *data)
+ {
+-	pr_info("plat_chip_enable\n");
++	pr_info("%s\n", __func__);
+ 	bluetooth_power(1);
+ 	wake_lock(&st_wk_lock);
++	pr_info("%s: done\n", __func__);
+ 	return 1;
+ }
+ 
+ static int plat_chip_disable(struct kim_data_s *data)
+ {
+-	pr_info("plat_chip_disable\n");
++	pr_info("%s\n", __func__);
+ 	bluetooth_power(0);
+ 	wake_unlock(&st_wk_lock);
++	pr_info("%s: done\n", __func__);
+ 	return 1;
  }
  
 +static unsigned long retry_suspend;
 +
 +int plat_kim_suspend(struct platform_device *pdev, pm_message_t state)
 +{
-+pr_info("plat_kim_suspend\n");
-+        return 0;
-+}
-+int plat_kim_resume(struct platform_device *pdev)
-+{
-+retry_suspend = 0;
-+        return 0;
++	struct kim_data_s *kim_gdata;
++	struct st_data_s *core_data;
++	pr_info("%s\n", __func__);
++	kim_gdata = dev_get_drvdata(&pdev->dev);
++	core_data = kim_gdata->core_data;
++	if (st_ll_getstate(core_data) != ST_LL_INVALID) {
++		/* Prevent suspend until sleep indication from chip */
++		while (st_ll_getstate(core_data) != ST_LL_ASLEEP &&
++			(retry_suspend++ < 5)) {
++			pr_err("%s: fail\n", __func__);
++			return -1;
++		}
++	}
++	pr_info("%s: ok\n", __func__);
++	return 0;
 +}
 +
- static struct wake_lock st_wk_lock;
- 
- static int plat_chip_enable(void)
-@@ -5349,6 +5362,8 @@ static int plat_chip_disable(void)
-         .dev_name = WILINK_UART_DEV_NAME,
-         .flow_cntrl = 1,
-         .baud_rate = 3000000,
-+	.suspend = plat_kim_suspend,
-+	.resume = plat_kim_resume,
++int plat_kim_resume(struct platform_device *pdev) 
++{
++	pr_info("%s\n", __func__);
++	retry_suspend = 0;
++	return 0;
++}
++
+ /* wl128x BT, FM, GPS connectivity chip */
+ static struct ti_st_plat_data wilink_pdata = {
+ 	.dev_name = WILINK_UART_DEV_NAME,
+@@ -5348,6 +5378,8 @@ static struct ti_st_plat_data wilink_pda
+ 	.baud_rate = 3000000,
  	.chip_enable = plat_chip_enable,
  	.chip_disable = plat_chip_disable,
++	.suspend = plat_kim_suspend,
++	.resume = plat_kim_resume,
  };
--- 
-1.8.1.6
-
-</pre></body></html>
+ 
+ static struct platform_device btwilink_device = {
