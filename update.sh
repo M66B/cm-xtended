@@ -416,6 +416,9 @@ if [ "${kernel_mods}" = "Y" ]; then
 			if [ "${fmradio}" = "Y" ]; then
 				do_replace "# CONFIG_RADIO_WL1273 is not set" "CONFIG_RADIO_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_MFD_WL1273_CORE is not set" "CONFIG_MFD_WL1273_CORE=y" arch/arm/configs/nAa_${device}_defconfig
+				do_replace "# CONFIG_SOUND_PRIME is not set" "CONFIG_SOUND_PRIME=y" arch/arm/configs/nAa_${device}_defconfig
+
+				#Doesn't work (source not compiled)
 				do_append "CONFIG_SND_SOC_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		else
