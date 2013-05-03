@@ -409,6 +409,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 			if [ "${fmradio}" = "Y" ]; then
 				do_replace "# CONFIG_RADIO_WL1273 is not set" "CONFIG_RADIO_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
+				do_replace "# CONFIG_MFD_WL1273_CORE is not set" "CONFIG_MFD_WL1273_CORE=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		else
 			echo "--- No kernel config for ${device}"
