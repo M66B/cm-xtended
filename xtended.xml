@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 	<!-- Build iw from source -->
-	<project name="dickychiang/iw" path="external/iw" remote="github" revision="android" />
+	<!--project name="dickychiang/iw" path="external/iw" remote="github" revision="android" /-->
+	<project name="br101/android_external_iw" path="external/iw" remote="github" revision="master" />
 
 	<!-- Replaces -->
 	<remove-project name="mikeNG/msm7x30-3.0.x-nAa" />

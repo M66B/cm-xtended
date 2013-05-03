@@ -197,6 +197,12 @@ if [ "${init}" = "Y" ]; then
 	do_deldir ${android}/.repo/projects/packages/apps/CMUpdater.git
 fi
 
+#iw
+if [ "${iw}" = "Y" ]; then
+	do_deldir ${android}/external/iw
+	do_deldir ${android}/.repo/projects/external/iw.git
+fi
+
 #PDroid
 if [ "${pdroid}" = "Y" ]; then
 	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
@@ -237,7 +243,7 @@ do_copy ${patches}/xtended.xml ${lmanifests}/xtended.xml
 if [ "${iw}" = "Y" ]; then
 	echo "--- iw"
 else
-	sed -i "/dickychiang/d" ${android}/.repo/local_manifests/xtended.xml
+	sed -i "/br101/d" ${android}/.repo/local_manifests/xtended.xml
 fi
 
 #CMUpdater
@@ -474,7 +480,7 @@ if [ "${cellbroadcast}" = "Y" ]; then
 	do_patch cb_settings.patch
 fi
 
-#OpenPDroid
+#PDroid
 if [ "${pdroid}" = "Y" ]; then
 	echo "*** PDroid ***"
 
