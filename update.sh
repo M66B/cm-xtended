@@ -385,6 +385,10 @@ if [ "${kernel_mods}" = "Y" ]; then
 		do_patch kernel_autogroup_perm.patch
 	fi
 
+	if [ "${fmradio}" = "Y" ]; then
+		do_patch kernel_fmradio.patch
+	fi
+
 	for device in ${devices}
 	do
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
@@ -401,6 +405,10 @@ if [ "${kernel_mods}" = "Y" ]; then
 				do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
+			fi
+
+			if [ "${fmradio}" = "Y" ]; then
+				do_replace "# CONFIG_RADIO_WL1273 is not set" "CONFIG_RADIO_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		else
 			echo "--- No kernel config for ${device}"
@@ -584,6 +592,8 @@ if [ "${fmradio}" = "Y" ]; then
 
 	do_replace "#BOARD_HAVE_FM_RADIO_TI := true" "BOARD_HAVE_FM_RADIO_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 	do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+
+	do_append "/dev/radio0              0777   system  radio" ${android}/device/semc/msm7x30-common/prebuilt/ueventd.semc.rc
 fi
 
 #Custom patches

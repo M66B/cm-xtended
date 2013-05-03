@@ -1,0 +1,94 @@
+diff --git a/drivers/media/radio/radio-wl1273.c b/drivers/media/radio/radio-wl1273.c
+index 459f727..5e7dfda 100644
+--- a/drivers/media/radio/radio-wl1273.c
++++ b/drivers/media/radio/radio-wl1273.c
+@@ -23,6 +23,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/mfd/wl1273-core.h>
+ #include <linux/slab.h>
++#include <linux/module.h>
+ #include <media/v4l2-common.h>
+ #include <media/v4l2-ctrls.h>
+ #include <media/v4l2-device.h>
+@@ -1382,7 +1383,7 @@ static int wl1273_fm_g_volatile_ctrl(struct v4l2_ctrl *ctrl)
+ 
+ 	switch (ctrl->id) {
+ 	case  V4L2_CID_TUNE_ANTENNA_CAPACITOR:
+-		ctrl->cur.val = wl1273_fm_get_tx_ctune(radio);
++		ctrl->val = wl1273_fm_get_tx_ctune(radio);
+ 		break;
+ 
+ 	default:
+diff --git a/drivers/mfd/mfd-core.c b/drivers/mfd/mfd-core.c
+index 0902523..ef80da6 100644
+--- a/drivers/mfd/mfd-core.c
++++ b/drivers/mfd/mfd-core.c
+@@ -17,6 +17,11 @@
+ #include <linux/mfd/core.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/slab.h>
++#include <linux/module.h>
++
++static struct device_type mfd_dev_type = {
++	.name	= "mfd_device",
++};
+ 
+ int mfd_cell_enable(struct platform_device *pdev)
+ {
+@@ -87,6 +92,7 @@ static int mfd_add_device(struct device *parent, int id,
+ 		goto fail_device;
+ 
+ 	pdev->dev.parent = parent;
++	pdev->dev.type = &mfd_dev_type;
+ 
+ 	if (cell->pdata_size) {
+ 		ret = platform_device_add_data(pdev,
+@@ -122,7 +128,7 @@ static int mfd_add_device(struct device *parent, int id,
+ 		}
+ 
+ 		if (!cell->ignore_resource_conflicts) {
+-			ret = acpi_check_resource_conflict(res);
++			ret = acpi_check_resource_conflict(&res[r]);
+ 			if (ret)
+ 				goto fail_res;
+ 		}
+@@ -161,7 +167,7 @@ int mfd_add_devices(struct device *parent, int id,
+ 	atomic_t *cnts;
+ 
+ 	/* initialize reference counting for all cells */
+-	cnts = kcalloc(sizeof(*cnts), n_devs, GFP_KERNEL);
++	cnts = kcalloc(n_devs, sizeof(*cnts), GFP_KERNEL);
+ 	if (!cnts)
+ 		return -ENOMEM;
+ 
+@@ -182,10 +188,16 @@ EXPORT_SYMBOL(mfd_add_devices);
+ 
+ static int mfd_remove_devices_fn(struct device *dev, void *c)
+ {
+-	struct platform_device *pdev = to_platform_device(dev);
+-	const struct mfd_cell *cell = mfd_get_cell(pdev);
++	struct platform_device *pdev;
++	const struct mfd_cell *cell;
+ 	atomic_t **usage_count = c;
+ 
++	if (dev->type != &mfd_dev_type)
++		return 0;
++
++	pdev = to_platform_device(dev);
++	cell = mfd_get_cell(pdev);
++
+ 	/* find the base address of usage_count pointers (for freeing) */
+ 	if (!*usage_count || (cell->usage_count < *usage_count))
+ 		*usage_count = cell->usage_count;
+diff --git a/drivers/mfd/wl1273-core.c b/drivers/mfd/wl1273-core.c
+index d97a869..f39b756 100644
+--- a/drivers/mfd/wl1273-core.c
++++ b/drivers/mfd/wl1273-core.c
+@@ -22,6 +22,7 @@
+ 
+ #include <linux/mfd/wl1273-core.h>
+ #include <linux/slab.h>
++#include <linux/module.h>
+ 
+ #define DRIVER_DESC "WL1273 FM Radio Core"
+ 
