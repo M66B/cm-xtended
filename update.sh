@@ -53,7 +53,7 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 #bootimage
 
 kernel_mods=Y
-kernel_linaro=N
+kernel_linaro=Y
 kernel_fixes=Y
 kernel_clock=Y
 kernel_underclock=N
@@ -405,6 +405,10 @@ if [ "${kernel_mods}" = "Y" ]; then
 			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_USB_OTG is not set" "CONFIG_USB_OTG=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_USB_OTG_WHITELIST is not set" "CONFIG_USB_OTG_WHITELIST=y" arch/arm/configs/nAa_${device}_defconfig
+
+			if [ "${kernel_linaro}" = "Y" ]; then
+				do_replace "CONFIG_ARM_UNWIND=y" "# CONFIG_ARM_UNWIND is not set" arch/arm/configs/nAa_${device}_defconfig
+			fi
 
 			if [ "${kernel_ti_st}" = "Y" ]; then
 				do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig

@@ -12,7 +12,7 @@ Building
 
 The script resets your build environment to pristine state and applies the provided patches for the extended ROM/kernel.
 
-**Use at your own risk !!!*
+**Use at your own risk !!!**
 
 License
 -------
