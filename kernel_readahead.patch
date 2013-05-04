@@ -1,0 +1,27 @@
+From 5f76ca11efa466ad7275b7ccbf9cf10937e3c85d Mon Sep 17 00:00:00 2001
+From: paul678 <pastbps18@gmail.com>
+Date: Tue, 30 Apr 2013 10:01:29 +0300
+Subject: [PATCH] mm: Increase MAX and MIN readahead
+
+---
+ include/linux/mm.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index c73fdf8..0a3ece1 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1473,8 +1473,8 @@ extern void truncate_inode_pages_range(struct address_space *,
+ void task_dirty_inc(struct task_struct *tsk);
+ 
+ /* readahead.c */
+-#define VM_MAX_READAHEAD	128	/* kbytes */
+-#define VM_MIN_READAHEAD	16	/* kbytes (includes current page) */
++#define VM_MAX_READAHEAD	1024	/* kbytes */
++#define VM_MIN_READAHEAD	32	/* kbytes (includes current page) */
+ 
+ int force_page_cache_readahead(struct address_space *mapping, struct file *filp,
+ 			pgoff_t offset, unsigned long nr_to_read);
+-- 
+1.8.1.6
+

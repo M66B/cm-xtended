@@ -61,6 +61,7 @@ kernel_hdmi=Y
 kernel_usb_tether=Y
 kernel_ti_st=Y
 kernel_xtended_perm=Y
+kernel_readahead=Y
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
@@ -393,6 +394,10 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 	if [ "${fmradio}" = "Y" ]; then
 		do_patch kernel_fmradio.patch
+	fi
+
+	if [ "${kernel_readahead}" = "Y" ]; then
+		do_patch kernel_readahead.patch
 	fi
 
 	for device in ${devices}
