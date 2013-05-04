@@ -36,12 +36,16 @@ tmp=/tmp
 android=~/android/${cm}
 devices="coconut iyokan mango smultron"
 init=N
+kernel=N
 updates=N
 onecorebuild=N
 debug=N
 
 if [ "$1" = "init" ]; then
 	init=Y
+fi
+if [ "$1" = "kernel" ]; then
+	kernel=Y
 fi
 
 #Linaro
@@ -101,6 +105,7 @@ echo "Tmp: ${tmp}"
 echo "Android: ${android}"
 echo "Devices: ${devices}"
 echo "Init: ${init}"
+echo "Kernel: ${kernel}"
 echo "Updates: ${updates}"
 echo ""
 
@@ -181,6 +186,26 @@ do_copy() {
 	fi
 }
 
+do_clean() {
+	echo "*** Clean `pwd`"
+	git reset --hard
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	git clean -dxf
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	if [ "$1" = "" ]; then
+		git pull github cm-10.1
+	else
+		git pull github M7630AABBQMLZA404033I-nAa-master
+	fi
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+}
+
 #Headless
 mkdir -p ~/Downloads
 
@@ -203,9 +228,11 @@ if [ "${iw}" = "Y" ]; then
 fi
 
 #PDroid
-do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
-do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
-do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
+if [ "${kernel}" != "Y" ]; then
+	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
+	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
+	do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
+fi
 
 for device in ${devices}
 do
@@ -250,16 +277,32 @@ fi
 
 #Synchronize
 echo "*** Repo sync ***"
-cd ${android}
-if [ "${init}" != "Y" ]; then
-	${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
+if [ "${kernel}" = "Y" ]; then
+	cd ${android}/kernel/semc/msm7x30
+	do_clean M7630AABBQMLZA404033I-nAa-master
+	cd ${android}/bootable/recovery
+	do_clean
+	cd ${android}/device/semc/msm7x30-common
+	do_clean
+	cd ${android}/device/semc/mogami-common
+	do_clean
+	for device in ${devices}
+	do
+		cd ${android}/device/semc/${device}
+		do_clean
+	done
+else
+	cd ${android}
+	if [ "${init}" != "Y" ]; then
+		${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+	fi
+	${repo} sync
 	if [ $? -ne 0 ]; then
 		exit
 	fi
-fi
-${repo} sync
-if [ $? -ne 0 ]; then
-	exit
 fi
 
 #Linaro toolchain
@@ -287,53 +330,56 @@ if [ "${kernel_linaro}" = "Y" ]; then
 	fi
 fi
 
-#Prebuilts
-if [ "${pdroid}" = "Y" ]; then
-	do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid2.0.apk -O -L https://github.com/CollegeDev/PDroid2.0_Manager_Compiled/raw/jellybean-devel/PDroid2.0.apk" ${android}/vendor/cm/get-prebuilts
-	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid2.0.apk:system/app/PDroid2.0.apk" ${android}/vendor/cm/config/common.mk
+if [ "${kernel}" != "Y" ]; then
+
+	#Prebuilts
+	if [ "${pdroid}" = "Y" ]; then
+		do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid2.0.apk -O -L https://github.com/CollegeDev/PDroid2.0_Manager_Compiled/raw/jellybean-devel/PDroid2.0.apk" ${android}/vendor/cm/get-prebuilts
+		do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid2.0.apk:system/app/PDroid2.0.apk" ${android}/vendor/cm/config/common.mk
+	fi
+
+	if [ "${updates}" = "Y" ]; then
+		do_append "curl -L -o ${android}/vendor/cm/proprietary/GooManager.apk -O -L https://github.com/solarnz/GooManager_prebuilt/blob/master/GooManager.apk?raw=true" ${android}/vendor/cm/get-prebuilts
+		do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/GooManager.apk:system/app/GooManager.apk" ${android}/vendor/cm/config/common.mk
+	fi
+
+	${android}/vendor/cm/get-prebuilts
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+
+	#APN's CM10.1
+	if [ "${apn_cm10_1}" = "Y" ]; then
+		cd ${android}/vendor/cm/prebuilt/common/etc
+		wget -N https://raw.github.com/CyanogenMod/android_vendor_cm/cm-10.1/prebuilt/common/etc/apns-conf.xml
+	fi
+
+	#One core build
+	if [ "${onecorebuild}" = "Y" ]; then
+		echo "*** One core build"
+		cd ${android}/build
+		do_patch onecore.patch
+	fi
+
+	#--- merge requests ---
+
+	echo "*** Merge requests ***"
+	#http://review.cyanogenmod.org/#/c/32906/
+	cd ${android}/frameworks/av/
+	git fetch http://review.cyanogenmod.org/CyanogenMod/android_frameworks_av refs/changes/06/32906/2 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+	#http://review.cyanogenmod.org/#/c/28336/
+	cd ${android}/packages/apps/LegacyCamera/
+	git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_LegacyCamera refs/changes/36/28336/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+	#http://review.cyanogenmod.org/#/c/34989/
+	cd ${android}/hardware/qcom/audio-caf
+	git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_qcom_audio-caf refs/changes/89/34989/5 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+	#http://review.cyanogenmod.org/#/c/36875/
+	cd ${android}/packages/apps/Mms
+	git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Mms refs/changes/75/36875/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 fi
-
-if [ "${updates}" = "Y" ]; then
-	do_append "curl -L -o ${android}/vendor/cm/proprietary/GooManager.apk -O -L https://github.com/solarnz/GooManager_prebuilt/blob/master/GooManager.apk?raw=true" ${android}/vendor/cm/get-prebuilts
-	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/GooManager.apk:system/app/GooManager.apk" ${android}/vendor/cm/config/common.mk
-fi
-
-${android}/vendor/cm/get-prebuilts
-if [ $? -ne 0 ]; then
-	exit
-fi
-
-#APN's CM10.1
-if [ "${apn_cm10_1}" = "Y" ]; then
-	cd ${android}/vendor/cm/prebuilt/common/etc
-	wget -N https://raw.github.com/CyanogenMod/android_vendor_cm/cm-10.1/prebuilt/common/etc/apns-conf.xml
-fi
-
-#One core build
-if [ "${onecorebuild}" = "Y" ]; then
-	echo "*** One core build"
-	cd ${android}/build
-	do_patch onecore.patch
-fi
-
-#--- merge requests ---
-
-echo "*** Merge requests ***"
-#http://review.cyanogenmod.org/#/c/32906/
-cd ${android}/frameworks/av/
-git fetch http://review.cyanogenmod.org/CyanogenMod/android_frameworks_av refs/changes/06/32906/2 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
-
-#http://review.cyanogenmod.org/#/c/28336/
-cd ${android}/packages/apps/LegacyCamera/
-git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_LegacyCamera refs/changes/36/28336/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
-
-#http://review.cyanogenmod.org/#/c/34989/
-cd ${android}/hardware/qcom/audio-caf
-git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_qcom_audio-caf refs/changes/89/34989/5 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
-
-#http://review.cyanogenmod.org/#/c/36875/
-cd ${android}/packages/apps/Mms
-git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Mms refs/changes/75/36875/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 
 #--- kernel ---
 
@@ -485,120 +531,123 @@ fi
 
 #--- ROM ---
 
-#Cell broadcast
-if [ "${cellbroadcast}" = "Y" ]; then
-	echo "*** Cell broadcast ***"
-	do_append "PRODUCT_PACKAGES += CellBroadcastReceiver" ${android}/build/target/product/core.mk
-	cd ${android}/device/semc/mogami-common
-	do_patch cb_settings.patch
-fi
+if [ "${kernel}" != "Y" ]; then
 
-#PDroid
-if [ "${pdroid}" = "Y" ]; then
-	echo "*** PDroid ***"
+	#Cell broadcast
+	if [ "${cellbroadcast}" = "Y" ]; then
+		echo "*** Cell broadcast ***"
+		do_append "PRODUCT_PACKAGES += CellBroadcastReceiver" ${android}/build/target/product/core.mk
+		cd ${android}/device/semc/mogami-common
+		do_patch cb_settings.patch
+	fi
 
-	cd ${android}/build
-	do_patch PDroid1.54/CM10.1_build.patch
-	cd ${android}/libcore
-	do_patch PDroid1.54/CM10.1_libcore.patch
-	cd ${android}/packages/apps/Mms
-	do_patch PDroid1.54/CM10.1_Mms.patch
-	cd ${android}/frameworks/base
-	do_patch PDroid1.54/CM10.1_framework.patch
-	cd ${android}/frameworks/opt/telephony
-	do_patch PDroid1.54/CM10.1_telephony.patch
-	cd ${android}/packages/apps/Settings
-	do_patch PDroid1.54/CM10.1_Settings.patch
+	#PDroid
+	if [ "${pdroid}" = "Y" ]; then
+		echo "*** PDroid ***"
 
-	mkdir -p ${android}/privacy
-	do_copy ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy
-	do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
-fi
+		cd ${android}/build
+		do_patch PDroid1.54/CM10.1_build.patch
+		cd ${android}/libcore
+		do_patch PDroid1.54/CM10.1_libcore.patch
+		cd ${android}/packages/apps/Mms
+		do_patch PDroid1.54/CM10.1_Mms.patch
+		cd ${android}/frameworks/base
+		do_patch PDroid1.54/CM10.1_framework.patch
+		cd ${android}/frameworks/opt/telephony
+		do_patch PDroid1.54/CM10.1_telephony.patch
+		cd ${android}/packages/apps/Settings
+		do_patch PDroid1.54/CM10.1_Settings.patch
 
-#terminfo
-if [ "${terminfo}" = "Y" ]; then
-	echo "*** Terminfo ***"
-	terminfo_dl=~/Downloads/termtypes.master.gz
-	if [ ! -f "${terminfo_dl}" ]; then
-		wget -O ${terminfo_dl} http://catb.org/terminfo/termtypes.master.gz
+		mkdir -p ${android}/privacy
+		do_copy ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy
+		do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
+	fi
+
+	#terminfo
+	if [ "${terminfo}" = "Y" ]; then
+		echo "*** Terminfo ***"
+		terminfo_dl=~/Downloads/termtypes.master.gz
+		if [ ! -f "${terminfo_dl}" ]; then
+			wget -O ${terminfo_dl} http://catb.org/terminfo/termtypes.master.gz
+			if [ $? -ne 0 ]; then
+				exit
+			fi
+		fi
+
+		echo "--- Extracting"
+		gunzip <${terminfo_dl} >${tmp}/termtypes.master
+		echo "--- Converting"
+		tic -o ${android}/vendor/cm/prebuilt/common/etc/terminfo/ ${tmp}/termtypes.master
 		if [ $? -ne 0 ]; then
 			exit
 		fi
+		echo "--- Installing"
+		do_append "PRODUCT_COPY_FILES += \\" ${android}/vendor/cm/config/common.mk
+		cd ${android}/vendor/cm/prebuilt/common
+		find etc/terminfo -type f -exec echo "    vendor/cm/prebuilt/common/{}:system/{} \\" >>${android}/vendor/cm/config/common.mk \;
+
+		cd ${android}/vendor/cm/prebuilt/common/etc
+		do_patch mkshrc.patch
 	fi
 
-	echo "--- Extracting"
-	gunzip <${terminfo_dl} >${tmp}/termtypes.master
-	echo "--- Converting"
-	tic -o ${android}/vendor/cm/prebuilt/common/etc/terminfo/ ${tmp}/termtypes.master
-	if [ $? -ne 0 ]; then
-		exit
+	#Mass storage
+	if [ "${massstorage}" = "Y" ]; then
+		echo "*** Mass storage ***"
+		cd ${android}/device/semc/msm7x30-common
+		do_patch mass_storage.patch
 	fi
-	echo "--- Installing"
-	do_append "PRODUCT_COPY_FILES += \\" ${android}/vendor/cm/config/common.mk
-	cd ${android}/vendor/cm/prebuilt/common
-	find etc/terminfo -type f -exec echo "    vendor/cm/prebuilt/common/{}:system/{} \\" >>${android}/vendor/cm/config/common.mk \;
 
-	cd ${android}/vendor/cm/prebuilt/common/etc
-	do_patch mkshrc.patch
-fi
+	#Xtended settings
+	if [ "${xsettings}" = "Y" ]; then
+		echo "*** Xtended settings ***"
+		cd ${android}/packages/apps/Settings
+		do_patch xsettings.patch
+		cd ${android}/device/semc/mogami-common
+		do_patch mogami_xtended.patch
+	fi
 
-#Mass storage
-if [ "${massstorage}" = "Y" ]; then
-	echo "*** Mass storage ***"
-	cd ${android}/device/semc/msm7x30-common
-	do_patch mass_storage.patch
-fi
+	#ssh
+	if [ "${ssh}" = "Y" ]; then
+		echo "*** sftp-server ***"
+		cd ${android}/external/openssh
+		do_patch sftp-server.patch
+		#needs extra 'mmm external/openssh'
+	fi
 
-#Xtended settings
-if [ "${xsettings}" = "Y" ]; then
-	echo "*** Xtended settings ***"
-	cd ${android}/packages/apps/Settings
-	do_patch xsettings.patch
-	cd ${android}/device/semc/mogami-common
-	do_patch mogami_xtended.patch
-fi
+	#Smartass boost pulse
+	if [ "${boost_pulse}" = "Y" ]; then
+		echo "*** Enable Smartass boost pulse ***"
+		cd ${android}/device/semc/msm7x30-common
+		do_patch power_boost_pulse.patch
+	fi
 
-#ssh
-if [ "${ssh}" = "Y" ]; then
-	echo "*** sftp-server ***"
-	cd ${android}/external/openssh
-	do_patch sftp-server.patch
-	#needs extra 'mmm external/openssh'
-fi
+	#goo.im
+	if [ "${updates}" = "Y" ]; then
+		echo "*** goo.im ***"
+		do_append "PRODUCT_PROPERTY_OVERRIDES += \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
+		do_append "    ro.goo.developerid=M66B \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
+		do_append "    ro.goo.rom=Xtd \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
+		do_append "    ro.goo.version=\$(shell date +%s)" ${android}/device/semc/msm7x30-common/msm7x30.mk
+	fi
 
-#Smartass boost pulse
-if [ "${boost_pulse}" = "Y" ]; then
-	echo "*** Enable Smartass boost pulse ***"
-	cd ${android}/device/semc/msm7x30-common
-	do_patch power_boost_pulse.patch
-fi
+	#iw
+	if [ "${iw}" = "Y" ]; then
+		echo "*** iw ***"
+		#cd ${android}/external/iw
+		#do_patch iw.patch
+		cd ${android}/vendor/semc/mogami-common
+		do_patch mogami_iw.patch
+	fi
 
-#goo.im
-if [ "${updates}" = "Y" ]; then
-	echo "*** goo.im ***"
-	do_append "PRODUCT_PROPERTY_OVERRIDES += \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
-	do_append "    ro.goo.developerid=M66B \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
-	do_append "    ro.goo.rom=Xtd \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
-	do_append "    ro.goo.version=\$(shell date +%s)" ${android}/device/semc/msm7x30-common/msm7x30.mk
-fi
+	#FM radio
+	if [ "${fmradio}" = "Y" ]; then
+		echo "*** FM radio ***"
+		do_replace "#BOARD_HAVE_QCOM_FM := true" "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+		do_replace "#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+		do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 
-#iw
-if [ "${iw}" = "Y" ]; then
-	echo "*** iw ***"
-	#cd ${android}/external/iw
-	#do_patch iw.patch
-	cd ${android}/vendor/semc/mogami-common
-	do_patch mogami_iw.patch
-fi
-
-#FM radio
-if [ "${fmradio}" = "Y" ]; then
-	echo "*** FM radio ***"
-	do_replace "#BOARD_HAVE_QCOM_FM := true" "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-	do_replace "#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-	do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-
-	do_append "/dev/radio0              0777   system  radio" ${android}/device/semc/msm7x30-common/prebuilt/ueventd.semc.rc
+		do_append "/dev/radio0              0777   system  radio" ${android}/device/semc/msm7x30-common/prebuilt/ueventd.semc.rc
+	fi
 fi
 
 #Custom patches
