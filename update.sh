@@ -80,7 +80,6 @@ xsettings=Y
 ssh=Y
 boost_pulse=Y
 iw=Y
-mmsfix=Y
 fmradio=Y
 
 #Local configuration
@@ -333,6 +332,10 @@ git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Legacy
 #http://review.cyanogenmod.org/#/c/34989/
 cd ${android}/hardware/qcom/audio-caf
 git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_qcom_audio-caf refs/changes/89/34989/5 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+#http://review.cyanogenmod.org/#/c/36875/
+cd ${android}/packages/apps/Mms
+git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Mms refs/changes/75/36875/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 
 #--- kernel ---
 
@@ -587,13 +590,6 @@ if [ "${iw}" = "Y" ]; then
 	#do_patch iw.patch
 	cd ${android}/vendor/semc/mogami-common
 	do_patch mogami_iw.patch
-fi
-
-#MMS fix
-if [ "${mmsfix}" = "Y" ]; then
-	echo "*** MMS fix ***"
-	cd ${android}/packages/apps/Mms
-	do_patch mms_cursor.patch
 fi
 
 #FM radio
