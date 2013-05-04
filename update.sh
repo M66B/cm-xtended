@@ -203,11 +203,9 @@ if [ "${iw}" = "Y" ]; then
 fi
 
 #PDroid
-if [ "${pdroid}" = "Y" ]; then
-	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
-	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
-	do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
-fi
+do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
+do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
+do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
 
 for device in ${devices}
 do
@@ -425,15 +423,16 @@ if [ "${kernel_mods}" = "Y" ]; then
 			fi
 
 			if [ "${fmradio}" = "Y" ]; then
+				#do_replace "# CONFIG_RADIO_WL128X is not set" "CONFIG_RADIO_WL128X=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_RADIO_WL1273 is not set" "CONFIG_RADIO_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_MFD_WL1273_CORE is not set" "CONFIG_MFD_WL1273_CORE=y" arch/arm/configs/nAa_${device}_defconfig
-				do_replace "# CONFIG_SOUND_PRIME is not set" "CONFIG_SOUND_PRIME=y" arch/arm/configs/nAa_${device}_defconfig
 
 				#do_replace "CONFIG_BT_HCIUART_H4=y" "#CONFIG_BT_HCIUART_H4 is not set" arch/arm/configs/nAa_${device}_defconfig
 				#do_replace "CONFIG_BT_HCIUART_LL=y" "#CONFIG_BT_HCIUART_LL is not set" arch/arm/configs/nAa_${device}_defconfig
 
+				#do_replace "# CONFIG_SOUND_PRIME is not set" "CONFIG_SOUND_PRIME=y" arch/arm/configs/nAa_${device}_defconfig
 				#Doesn't work (source not compiled)
-				do_append "CONFIG_SND_SOC_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
+				#do_append "CONFIG_SND_SOC_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		else
 			echo "--- No kernel config for ${device}"
