@@ -72,7 +72,7 @@ sideload=Y
 #ROM
 
 cellbroadcast=Y
-pdroid=Y
+pdroid=N
 terminfo=Y
 emptydrawer=N
 massstorage=Y
