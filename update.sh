@@ -75,7 +75,6 @@ sideload=Y
 cellbroadcast=Y
 pdroid=N
 terminfo=Y
-emptydrawer=N
 massstorage=Y
 xsettings=Y
 ssh=Y
@@ -539,13 +538,6 @@ if [ "${terminfo}" = "Y" ]; then
 
 	cd ${android}/vendor/cm/prebuilt/common/etc
 	do_patch mkshrc.patch
-fi
-
-#Empty drawer
-if [ "${emptydrawer}" = "Y" ]; then
-	echo "*** Empty drawer ***"
-	cd ${android}/bionic
-	do_patch emptydrawer.patch
 fi
 
 #Mass storage
