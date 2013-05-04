@@ -429,6 +429,9 @@ if [ "${kernel_mods}" = "Y" ]; then
 				do_replace "# CONFIG_MFD_WL1273_CORE is not set" "CONFIG_MFD_WL1273_CORE=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_SOUND_PRIME is not set" "CONFIG_SOUND_PRIME=y" arch/arm/configs/nAa_${device}_defconfig
 
+				#do_replace "CONFIG_BT_HCIUART_H4=y" "#CONFIG_BT_HCIUART_H4 is not set" arch/arm/configs/nAa_${device}_defconfig
+				#do_replace "CONFIG_BT_HCIUART_LL=y" "#CONFIG_BT_HCIUART_LL is not set" arch/arm/configs/nAa_${device}_defconfig
+
 				#Doesn't work (source not compiled)
 				do_append "CONFIG_SND_SOC_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
@@ -597,8 +600,6 @@ if [ "${fmradio}" = "Y" ]; then
 	echo "*** FM radio ***"
 	do_replace "#BOARD_HAVE_QCOM_FM := true" "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 	do_replace "#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-
-	do_replace "#BOARD_HAVE_FM_RADIO_TI := true" "BOARD_HAVE_FM_RADIO_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 	do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 
 	do_append "/dev/radio0              0777   system  radio" ${android}/device/semc/msm7x30-common/prebuilt/ueventd.semc.rc
