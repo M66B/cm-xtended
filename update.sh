@@ -645,7 +645,7 @@ if [ "${kernel}" != "Y" ]; then
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - ${pdroidurl}/CM10.1_framework.patch | patch -p3
+		wget q -O - ${pdroidurl}/CM10.1_framework.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
