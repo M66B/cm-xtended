@@ -35,6 +35,7 @@ repo=`which repo`
 tmp=/tmp
 android=~/android/${cm}
 devices="coconut iyokan mango smultron"
+hdmi="haida hallon iyokan"
 init=N
 kernel=N
 updates=N
@@ -411,10 +412,12 @@ if [ "${kernel_mods}" = "Y" ]; then
 	do_patch kernel_logo.patch
 
 	if [ "${kernel_fixes}" = "Y" ]; then
+		echo "--- Warnings"
 		do_patch kernel_fixes.patch
 	fi
 
 	if [ "${kernel_clock}" = "Y" ]; then
+		echo "--- Clock"
 		do_patch kernel_clock.patch
 		kernel_underclock=N
 	fi
@@ -425,15 +428,29 @@ if [ "${kernel_mods}" = "Y" ]; then
 	fi
 
 	if [ "${kernel_hdmi}" = "Y" ]; then
-		do_patch kernel_hdmi.patch
+		echo "--- HDMI"
 		do_patch kernel_hdmi_dependencies.patch
+		for device in ${hdmi}
+		do
+			if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
+				echo "--- HDMI ${device}"
+				do_replace "# CONFIG_FB_MSM_DTV is not set" "CONFIG_FB_MSM_DTV=y" arch/arm/configs/nAa_${device}_defconfig
+				do_replace "# CONFIG_FB_MSM_EXT_INTERFACE_COMMON is not set" "CONFIG_FB_MSM_EXT_INTERFACE_COMMON=y" arch/arm/configs/nAa_${device}_defconfig
+				do_replace "# CONFIG_FB_MSM_HDMI_COMMON is not set" "CONFIG_FB_MSM_EXT_INTERFACE_COMMON=y" arch/arm/configs/nAa_${device}_defconfig
+				do_replace "# CONFIG_FB_MSM_HDMI_SII9024A_PANEL is not set" "CONFIG_FB_MSM_HDMI_SII9024A_PANEL=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_UIO=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_UIO_PDRV_GENIRQ=y" arch/arm/configs/nAa_${device}_defconfig
+			fi
+		done
 	fi
 
 	if [ "${kernel_usb_tether}" = "Y" ]; then
+		echo "USB tether"
 		do_patch kernel_usb_tether.patch
 	fi
 
 	if [ "${kernel_ti_st}" = "Y" ]; then
+		echo "--- ti st"
 		do_patch kernel_ti_st.patch
 		do_patch kernel_mogami_ti_st.patch
 		do_patch kernel_mogami_ti_st_suspend.patch
@@ -442,6 +459,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 	fi
 
 	if [ "${kernel_linaro}" = "Y" ]; then
+		echo "--- Linaro"
 		do_patch kernel_linaro.patch
 	fi
 
@@ -452,10 +470,12 @@ if [ "${kernel_mods}" = "Y" ]; then
 	fi
 
 	if [ "${fmradio}" = "Y" ]; then
+		echo "--- FM radio"
 		do_patch kernel_fmradio.patch
 	fi
 
 	if [ "${kernel_readahead}" = "Y" ]; then
+		echo "--- readahead"
 		do_patch kernel_readahead.patch
 	fi
 
