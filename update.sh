@@ -105,7 +105,7 @@ echo "Tmp: ${tmp}"
 echo "Android: ${android}"
 echo "Devices: ${devices}"
 echo "Init: ${init}"
-echo "Kernel: ${kernel}"
+echo "Kernel only: ${kernel}"
 echo "Updates: ${updates}"
 echo ""
 
@@ -327,6 +327,9 @@ if [ "${kernel_linaro}" = "Y" ]; then
 		mkdir ${linaro_dir}
 		echo "--- Installing"
 		cp -R ./android-toolchain-eabi/* ${linaro_dir}
+		if [ $? -ne 0 ]; then
+			exit
+		fi
 	fi
 fi
 
@@ -380,6 +383,10 @@ if [ "${kernel}" != "Y" ]; then
 	cd ${android}/packages/apps/Mms
 	git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Mms refs/changes/75/36875/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 fi
+
+#http://review.cyanogenmod.org/#/c/36784/
+cd ${android}/bootable/recovery
+git fetch http://review.cyanogenmod.org/CyanogenMod/android_bootable_recovery refs/changes/84/36784/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 
 #--- kernel ---
 
