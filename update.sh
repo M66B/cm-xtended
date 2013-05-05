@@ -78,7 +78,7 @@ sideload=Y
 #ROM
 
 cellbroadcast=Y
-pdroid=N
+pdroid=Y
 terminfo=Y
 massstorage=Y
 xsettings=Y
@@ -573,23 +573,31 @@ if [ "${kernel}" != "Y" ]; then
 
 	#PDroid
 	if [ "${pdroid}" = "Y" ]; then
-		echo "*** PDroid ***"
+		echo "*** PDroid 1.57 ***"
 
-		cd ${android}/build
-		do_patch PDroid1.54/CM10.1_build.patch
-		cd ${android}/libcore
-		do_patch PDroid1.54/CM10.1_libcore.patch
-		cd ${android}/packages/apps/Mms
-		do_patch PDroid1.54/CM10.1_Mms.patch
-		cd ${android}/frameworks/base
-		do_patch PDroid1.54/CM10.1_framework.patch
-		cd ${android}/frameworks/opt/telephony
-		do_patch PDroid1.54/CM10.1_telephony.patch
-		cd ${android}/packages/apps/Settings
-		do_patch PDroid1.54/CM10.1_Settings.patch
+		cd ${android}
+		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_Mms.patch | patch -p1
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_PDAgent.patch | patch -p1
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_build.patch | patch -p1
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_framework.patch | patch -p1
+		if [ $? -ne 0 ]; then
+			exit
+		fi
+		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_libcore.patch | patch -p1
+		if [ $? -ne 0 ]; then
+			exit
+		fi
 
-		mkdir -p ${android}/privacy
-		do_copy ${patches}/PDroid1.54/PDroid.jpeg ${android}/privacy
+		do_copy ${patches}/PDroid.jpeg ${android}/privacy
 		do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
 	fi
 
