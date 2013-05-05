@@ -297,7 +297,7 @@ else
 	cd ${android}
 	if [ "${init}" != "Y" ]; then
 		${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
-		if [ $? -ne 0 ]; then
+		if [ $? -ne 0 ] && [ "${buildbot}" != "Y" ]; then
 			exit
 		fi
 	fi
