@@ -233,6 +233,7 @@ if [ "${kernel}" != "Y" ]; then
 	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
 	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
 	do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
+	do_deldir ${android}/packages/apps/PDroidAgent
 fi
 
 for device in ${devices}
@@ -633,23 +634,23 @@ if [ "${kernel}" != "Y" ]; then
 
 		cd ${android}
 		pdroidurl=https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1
-		wget q -O - ${pdroidurl}/CM10.1_Mms.patch | patch -p1
+		wget -O - ${pdroidurl}/CM10.1_Mms.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - ${pdroidurl}/CM10.1_PDAgent.patch | patch -p1
+		wget -O - ${pdroidurl}/CM10.1_PDAgent.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - ${pdroidurl}/CM10.1_build.patch | patch -p1
+		wget -O - ${pdroidurl}/CM10.1_build.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - ${pdroidurl}/CM10.1_framework.patch | patch -p1
+		wget -O - ${pdroidurl}/CM10.1_framework.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - ${pdroidurl}/CM10.1_libcore.patch | patch -p1
+		wget -O - ${pdroidurl}/CM10.1_libcore.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
