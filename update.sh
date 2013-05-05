@@ -644,8 +644,6 @@ if [ "${kernel}" != "Y" ]; then
 	#iw
 	if [ "${iw}" = "Y" ]; then
 		echo "*** iw ***"
-		#cd ${android}/external/iw
-		#do_patch iw.patch
 		cd ${android}/vendor/semc/mogami-common
 		do_patch mogami_iw.patch
 	fi
