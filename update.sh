@@ -408,6 +408,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 	cd ${android}/kernel/semc/msm7x30/
 
 	do_patch kernel_logo.patch
+	do_patch kernel_no_wifi_uv.patch
 
 	if [ "${kernel_fixes}" = "Y" ]; then
 		echo "--- Warnings"
