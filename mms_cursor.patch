@@ -1,0 +1,57 @@
+diff --git a/src/com/android/mms/data/WorkingMessage.java b/src/com/android/mms/data/WorkingMessage.java
+index 250a63a..a9459f1 100755
+--- a/src/com/android/mms/data/WorkingMessage.java
++++ b/src/com/android/mms/data/WorkingMessage.java
+@@ -1519,6 +1519,9 @@ public class WorkingMessage {
+         cursor = SqliteWrapper.query(context, cr,
+                 Mms.Draft.CONTENT_URI, MMS_DRAFT_PROJECTION,
+                 selection, null, null);
++        if (cursor == null) {
++            return null;
++        }
+ 
+         Uri uri;
+         try {
+diff --git a/src/com/android/mms/ui/ComposeMessageActivity.java b/src/com/android/mms/ui/ComposeMessageActivity.java
+index 9758ee7..cc6cc09 100644
+--- a/src/com/android/mms/ui/ComposeMessageActivity.java
++++ b/src/com/android/mms/ui/ComposeMessageActivity.java
+@@ -4347,12 +4347,14 @@ public class ComposeMessageActivity extends Activity
+                     int newSelectionPos = -1;
+                     long targetMsgId = getIntent().getLongExtra("select_id", -1);
+                     if (targetMsgId != -1) {
+-                        cursor.moveToPosition(-1);
+-                        while (cursor.moveToNext()) {
+-                            long msgId = cursor.getLong(COLUMN_ID);
+-                            if (msgId == targetMsgId) {
+-                                newSelectionPos = cursor.getPosition();
+-                                break;
++                        if (cursor != null) {
++                            cursor.moveToPosition(-1);
++                            while (cursor.moveToNext()) {
++                                long msgId = cursor.getLong(COLUMN_ID);
++                                if (msgId == targetMsgId) {
++                                    newSelectionPos = cursor.getPosition();
++                                    break;
++                                }
+                             }
+                         }
+                     } else if (mSavedScrollPosition != -1) {
+@@ -4384,7 +4386,7 @@ public class ComposeMessageActivity extends Activity
+                     } else {
+                         int count = mMsgListAdapter.getCount();
+                         long lastMsgId = 0;
+-                        if (count > 0) {
++                        if (cursor != null && count > 0) {
+                             cursor.moveToLast();
+                             lastMsgId = cursor.getLong(COLUMN_ID);
+                         }
+@@ -4408,7 +4410,7 @@ public class ComposeMessageActivity extends Activity
+                     // mSentMessage is true).
+                     // Show the recipients editor to give the user a chance to add
+                     // more people before the conversation begins.
+-                    if (cursor.getCount() == 0 && !isRecipientsEditorVisible() && !mSentMessage) {
++                    if (cursor != null && cursor.getCount() == 0 && !isRecipientsEditorVisible() && !mSentMessage) {
+                         initRecipientsEditor();
+                     }
+ 
