@@ -591,16 +591,6 @@ fi
 #FM radio
 if [ "${fmradio}" = "Y" ]; then
 	echo "*** FM radio ***"
-
-	#build flags
-	do_replace "#BOARD_HAVE_QCOM_FM := true" "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-	do_replace "#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-	do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-
-	#app
-	do_append "PRODUCT_PACKAGES += FmRxApp FmService libfmradio fmradioif com.ti.fm.fmradioif.xml" ${android}/device/semc/mogami-common/mogami.mk
-
-	#firmware
 	cd ~/Downloads
 	if [ ! -d proprietary-open ]; then
 		git clone git://git.omapzoom.org/device/ti/proprietary-open.git
