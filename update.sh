@@ -391,10 +391,6 @@ if [ "${kernel}" != "Y" ]; then
 	git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_ti_wpan refs/changes/72/36772/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 fi
 
-#http://review.cyanogenmod.org/#/c/36784/
-cd ${android}/bootable/recovery
-git fetch http://review.cyanogenmod.org/CyanogenMod/android_bootable_recovery refs/changes/84/36784/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
-
 #--- kernel ---
 
 #Linaro
