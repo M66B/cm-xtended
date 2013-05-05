@@ -543,7 +543,7 @@ fi
 do_replace "#BOARD_USES_LEGACY_CAMERA := true" "BOARD_USES_LEGACY_CAMERA := true" ${android}/device/semc/msm7x30-common/BoardConfigCommon.mk
 
 #BT log spam
-do_replace "ALOGI(\"vendor op - %d\", opcode);" "//ALOGI(\"vendor op - %d\", opcode);" ${android}/hardware/ti/wpan/bluedroid_wilink/libbt-vendor-ti.c
+do_replace "ALOGI(\"vendor op - %d\", opcode);" "\/\/ALOGI(\"vendor op - %d\", opcode);" ${android}/hardware/ti/wpan/bluedroid_wilink/libbt-vendor-ti.c
 
 #Boot logo
 if [ "${bootlogo}" = "Y" ]; then
