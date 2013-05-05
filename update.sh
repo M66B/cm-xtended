@@ -513,6 +513,34 @@ if [ "${kernel_mods}" = "Y" ]; then
 	done
 fi
 
+#--- Recovery ---
+
+#pincode
+if [ "${pin}" = "Y" ]; then
+	echo "*** Pincode"
+	cd ${android}/bootable/recovery
+	do_patch recovery_check_pin.patch
+	cd ${android}/device/semc/msm7x30-common
+	do_patch msm7x30_check_pin.patch
+	cd ${android}/device/semc/mogami-common
+	do_patch mogami_check_pin.patch
+	for device in ${devices}
+	do
+		initrc=${android}/device/semc/${device}/recovery/init.rc
+		do_replace "    restart adbd" "    #restart adbd" ${initrc}
+	done
+fi
+
+if [ "${sideload}" = "Y" ]; then
+	echo "*** CWM sideload cancel"
+	cd ${android}/bootable/recovery
+	do_patch recovery_sideload.patch
+fi
+
+#--- Device ---
+
+do_replace "#BOARD_USES_LEGACY_CAMERA := true" "BOARD_USES_LEGACY_CAMERA := true" ${android}/device/semc/msm7x30-common/BoardConfigCommon.mk
+
 #Boot logo
 if [ "${bootlogo}" = "Y" ]; then
 	echo "*** Boot logo ***"
@@ -537,26 +565,50 @@ if [ "${bootlogo}" = "Y" ]; then
 	${tmp}/to565 -rle <${tmp}/logo_M_new.raw >${android}/device/semc/msm7x30-common/prebuilt/logo_M.rle
 fi
 
-#pincode
-if [ "${pin}" = "Y" ]; then
-	echo "*** Pincode"
-	cd ${android}/bootable/recovery
-	do_patch recovery_check_pin.patch
+#Smartass boost pulse
+if [ "${boost_pulse}" = "Y" ]; then
+	echo "*** Enable Smartass boost pulse ***"
 	cd ${android}/device/semc/msm7x30-common
-	do_patch msm7x30_check_pin.patch
-	cd ${android}/device/semc/mogami-common
-	do_patch mogami_check_pin.patch
-	for device in ${devices}
-	do
-		initrc=${android}/device/semc/${device}/recovery/init.rc
-		do_replace "    restart adbd" "    #restart adbd" ${initrc}
-	done
+	do_patch power_boost_pulse.patch
 fi
 
-if [ "${sideload}" = "Y" ]; then
-	echo "*** CWM sideload cancel"
-	cd ${android}/bootable/recovery
-	do_patch recovery_sideload.patch
+#goo.im
+if [ "${updates}" = "Y" ]; then
+	echo "*** goo.im ***"
+	do_append "PRODUCT_PROPERTY_OVERRIDES += \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
+	do_append "    ro.goo.developerid=M66B \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
+	do_append "    ro.goo.rom=Xtd \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
+	do_append "    ro.goo.version=\$(shell date +%s)" ${android}/device/semc/msm7x30-common/msm7x30.mk
+fi
+
+#FM radio
+if [ "${fmradio}" = "Y" ]; then
+	echo "*** FM radio ***"
+
+	#build flags
+	do_replace "#BOARD_HAVE_QCOM_FM := true" "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+	do_replace "#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+	do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
+
+	#app
+	do_append "PRODUCT_PACKAGES += FmRxApp FmService libfmradio fmradioif com.ti.fm.fmradioif.xml" ${android}/device/semc/mogami-common/mogami.mk
+
+	#firmware
+	cd ~/Downloads
+	if [ ! -d proprietary-open ]; then
+		git clone git://git.omapzoom.org/device/ti/proprietary-open.git
+	fi
+	cd proprietary-open
+	git checkout jb-release
+	git pull
+	cd ~/Downloads
+	tar -zxvf ~/Downloads/proprietary-open/wl12xx/wpan.tgz
+	cd ~/Downloads/wpan/fmradio
+	for bts in *1273*.bts; do
+		echo "--- ${bts}"
+		cp ${bts} ${android}/device/semc/mogami-common/prebuilt/${bts}
+		do_append "PRODUCT_COPY_FILES += device/semc/mogami-common/prebuilt/${bts}:root/firmware/${bts}" ${android}/device/semc/mogami-common/mogami.mk
+	done
 fi
 
 #--- ROM ---
@@ -652,35 +704,11 @@ if [ "${kernel}" != "Y" ]; then
 		#needs extra 'mmm external/openssh'
 	fi
 
-	#Smartass boost pulse
-	if [ "${boost_pulse}" = "Y" ]; then
-		echo "*** Enable Smartass boost pulse ***"
-		cd ${android}/device/semc/msm7x30-common
-		do_patch power_boost_pulse.patch
-	fi
-
-	#goo.im
-	if [ "${updates}" = "Y" ]; then
-		echo "*** goo.im ***"
-		do_append "PRODUCT_PROPERTY_OVERRIDES += \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
-		do_append "    ro.goo.developerid=M66B \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
-		do_append "    ro.goo.rom=Xtd \\" ${android}/device/semc/msm7x30-common/msm7x30.mk
-		do_append "    ro.goo.version=\$(shell date +%s)" ${android}/device/semc/msm7x30-common/msm7x30.mk
-	fi
-
 	#iw
 	if [ "${iw}" = "Y" ]; then
 		echo "*** iw ***"
 		cd ${android}/vendor/semc/mogami-common
 		do_patch mogami_iw.patch
-	fi
-
-	#FM radio
-	if [ "${fmradio}" = "Y" ]; then
-		echo "*** FM radio ***"
-		do_replace "#BOARD_HAVE_QCOM_FM := true" "BOARD_HAVE_QCOM_FM := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-		do_replace "#COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" "COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED -DHAVE_SEMC_FM_RADIO" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
-		do_replace "#CFG_FM_SERVICE_TI := true" "CFG_FM_SERVICE_TI := true" ${android}/device/semc/mogami-common/BoardConfigCommon.mk
 	fi
 fi
 
