@@ -6,11 +6,7 @@ CM10.1 extended ROM/kernel patches
 Building
 --------
 
-0. Make sure you have at least 25 GB of free disk space
-1. Run the command: cd ~/Downloads && git clone https://github.com/M66B/cm-xtended.git
-2. Run the command: cd ~/Downloads/cm-xtended/ && . update.sh init
-
-The script resets your build environment to pristine state and applies the provided patches for the extended ROM/kernel.
+See [the wiki](https://github.com/M66B/cm-xtended/wiki) for building instructions.
 
 **Use at your own risk !!!**
 
