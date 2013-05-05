@@ -382,6 +382,10 @@ if [ "${kernel}" != "Y" ]; then
 	#http://review.cyanogenmod.org/#/c/36875/
 	cd ${android}/packages/apps/Mms
 	git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Mms refs/changes/75/36875/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
+
+	#http://review.cyanogenmod.org/#/c/36772/
+	cd ${android}/hardware/ti/wpan
+	git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_ti_wpan refs/changes/72/36772/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
 fi
 
 #http://review.cyanogenmod.org/#/c/36784/
