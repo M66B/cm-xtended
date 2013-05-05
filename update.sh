@@ -632,23 +632,24 @@ if [ "${kernel}" != "Y" ]; then
 		echo "*** PDroid 1.57 ***"
 
 		cd ${android}
-		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_Mms.patch | patch -p1
+		pdroidurl=https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1
+		wget q -O - ${pdroidurl}/CM10.1_Mms.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_PDAgent.patch | patch -p1
+		wget q -O - ${pdroidurl}/CM10.1_PDAgent.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_build.patch | patch -p1
+		wget q -O - ${pdroidurl}/CM10.1_build.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_framework.patch | patch -p1
+		wget q -O - ${pdroidurl}/CM10.1_framework.patch | patch -p3
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget q -O - https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1/CM10.1_libcore.patch | patch -p1
+		wget q -O - ${pdroidurl}/CM10.1_libcore.patch | patch -p1
 		if [ $? -ne 0 ]; then
 			exit
 		fi
