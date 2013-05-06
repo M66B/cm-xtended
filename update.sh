@@ -76,7 +76,6 @@ terminfo=Y
 xsettings=Y
 ssh=Y
 boost_pulse=Y
-iw=Y
 
 #Local configuration
 if [ -f ~/.cm101xtended ]; then
@@ -217,16 +216,7 @@ lmanifests=${android}/.repo/local_manifests
 mkdir -p ${lmanifests}
 curl https://raw.github.com/semc7x30/local_manifests/master/semc.xml >${lmanifests}/semc.xml
 rm -f ${lmanifests}/cmxtended.xml	#legacy
-do_copy ${patches}/xtended.xml ${lmanifests}/xtended.xml
-
-if [ "${iw}" = "Y" ]; then
-	echo "--- iw"
-	do_deldir ${android}/external/iw
-	do_deldir ${android}/.repo/projects/external/iw.git
-	sed -i "/system\/bin\/iw/d" ${android}/vendor/semc/mogami-common/mogami-common-vendor-blobs.mk
-else
-	sed -i "/br101/d" ${android}/.repo/local_manifests/xtended.xml
-fi
+rm -f ${lmanifests}/xtended.xml		#legacy
 
 #CMUpdater
 if [ "${updates}" = "Y" ]; then
