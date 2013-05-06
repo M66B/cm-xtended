@@ -59,7 +59,7 @@ kernel_hdmi=Y
 kernel_otg=N
 kernel_usb_tether=Y
 kernel_xtended=Y
-kernel_readahead=Y
+kernel_readahead=N
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
