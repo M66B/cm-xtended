@@ -1,4 +1,5 @@
 #!/bin/bash
+#set -e
 
 echo "$0" | grep -q bash
 if [ $? -eq 0 ] || [ "${buildbot}" = "Y" ]; then

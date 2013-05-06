@@ -1,5 +1,7 @@
 #!/bin/bash
 {
+	set -e
+
 	goofull=Y
 	goodevices="iyokan mango coconut smultron"
 	gootarget=/home/M66B/public_html/test
@@ -38,4 +40,4 @@
 	done
 
 	echo "Done"
-} >~/xtended.log 2>&1
+} >~/x101.log 2>&1

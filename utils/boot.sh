@@ -4,4 +4,6 @@ if [ "$1" = "" ]; then
 	exit
 fi
 android=~/android/system
-fastboot boot ${android}/out/target/product/$1/boot.img
+img=${android}/out/target/product/$1/boot.img
+echo "Booting ${img} ..."
+fastboot boot ${img}
