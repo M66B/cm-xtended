@@ -2,7 +2,4 @@
 <manifest>
 	<!-- Additions -->
 	<project name="br101/android_external_iw" path="external/iw" remote="github" revision="master" />
-
-	<!-- Removes -->
-	<remove-project name="CyanogenMod/android_packages_apps_CMUpdater" />
 </manifest>

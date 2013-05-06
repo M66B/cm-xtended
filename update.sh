@@ -71,10 +71,8 @@ pin=Y
 #ROM
 
 mms_fix=Y
-cellbroadcast=Y
 pdroid=Y
 terminfo=Y
-massstorage=Y
 xsettings=Y
 ssh=Y
 boost_pulse=Y
@@ -233,10 +231,7 @@ fi
 #CMUpdater
 if [ "${updates}" = "Y" ]; then
 	echo "--- updates"
-	do_deldir ${android}/packages/apps/CMUpdater
-	do_deldir ${android}/.repo/projects/packages/apps/CMUpdater.git
-else
-	sed -i "/android_packages_apps_CMUpdater/d" ${android}/.repo/local_manifests/xtended.xml
+	sed -i "/CMUpdater/d" ${android}/vendor/cm/config/common.mk
 fi
 
 #Sync
@@ -465,14 +460,6 @@ if [ "${mms_fix}" = "Y" ]; then
 	do_patch mms_cursor.patch
 fi
 
-#Cell broadcast
-if [ "${cellbroadcast}" = "Y" ]; then
-	echo "*** Cell broadcast ***"
-	do_append "PRODUCT_PACKAGES += CellBroadcastReceiver" ${android}/build/target/product/core.mk
-	cd ${android}/device/semc/mogami-common
-	do_patch cb_settings.patch
-fi
-
 #PDroid
 if [ "${pdroid}" = "Y" ]; then
 	echo "*** PDroid 1.57 ***"
@@ -529,13 +516,6 @@ if [ "${terminfo}" = "Y" ]; then
 
 	cd ${android}/vendor/cm/prebuilt/common/etc
 	do_patch mkshrc.patch
-fi
-
-#Mass storage
-if [ "${massstorage}" = "Y" ]; then
-	echo "*** Mass storage ***"
-	cd ${android}/device/semc/msm7x30-common
-	do_patch mass_storage.patch
 fi
 
 #Xtended settings
