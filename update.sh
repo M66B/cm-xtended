@@ -37,16 +37,12 @@ android=~/android/${cm}
 devices="coconut iyokan mango smultron"
 hdmi="haida hallon iyokan"
 init=N
-kernel=N
 updates=N
 onecorebuild=N
 debug=N
 
 if [ "$1" = "init" ]; then
 	init=Y
-fi
-if [ "$1" = "kernel" ]; then
-	kernel=Y
 fi
 
 #Linaro
@@ -59,13 +55,11 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 
 kernel_mods=Y
 kernel_linaro=Y
-kernel_fixes=Y
 kernel_clock=Y
 kernel_hdmi=Y
 kernel_otg=N
 kernel_usb_tether=Y
-kernel_ti_st=Y
-kernel_xtended_perm=Y
+kernel_xtended=Y
 kernel_readahead=Y
 
 bootlogo=Y
@@ -73,10 +67,10 @@ bootlogoh=logo_H_extended.png
 bootlogom=logo_M_extended.png
 
 pin=Y
-sideload=Y
 
 #ROM
 
+mms_fix=Y
 cellbroadcast=Y
 pdroid=Y
 terminfo=Y
@@ -85,7 +79,6 @@ xsettings=Y
 ssh=Y
 boost_pulse=Y
 iw=Y
-fmradio=Y
 
 #Local configuration
 if [ -f ~/.cm101xtended ]; then
@@ -106,7 +99,6 @@ echo "Tmp: ${tmp}"
 echo "Android: ${android}"
 echo "Devices: ${devices}"
 echo "Init: ${init}"
-echo "Kernel only: ${kernel}"
 echo "Updates: ${updates}"
 echo ""
 
@@ -187,54 +179,17 @@ do_copy() {
 	fi
 }
 
-do_clean() {
-	echo "*** Clean `pwd`"
-	git reset --hard
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-	git clean -dxf
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-	if [ "$1" = "" ]; then
-		git pull github cm-10.1
-	else
-		git pull github M7630AABBQMLZA404033I-nAa-master
-	fi
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-}
-
 #Headless
 mkdir -p ~/Downloads
 
 #Cleanup
 echo "*** Cleanup ***"
 
-#Replaced/removed projects
-if [ "${init}" = "Y" ]; then
-	do_deldir ${android}/kernel/semc/msm7x30
-	do_deldir ${android}/packages/apps/CMUpdater
-
-	do_deldir ${android}/.repo/projects/kernel/semc/msm7x30.git
-	do_deldir ${android}/.repo/projects/packages/apps/CMUpdater.git
-fi
-
-#iw
-if [ "${iw}" = "Y" ]; then
-	do_deldir ${android}/external/iw
-	do_deldir ${android}/.repo/projects/external/iw.git
-fi
-
 #PDroid
-if [ "${kernel}" != "Y" ]; then
-	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
-	do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
-	do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
-	do_deldir ${android}/packages/apps/PDroidAgent
-fi
+do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates
+do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediates
+do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
+do_deldir ${android}/packages/apps/PDroidAgent
 
 for device in ${devices}
 do
@@ -263,48 +218,39 @@ echo "*** Local manifest ***"
 lmanifests=${android}/.repo/local_manifests
 mkdir -p ${lmanifests}
 curl https://raw.github.com/semc7x30/local_manifests/master/semc.xml >${lmanifests}/semc.xml
-rm -f ${lmanifests}/cmxtended.xml
+rm -f ${lmanifests}/cmxtended.xml	#legacy
 do_copy ${patches}/xtended.xml ${lmanifests}/xtended.xml
 
 if [ "${iw}" = "Y" ]; then
 	echo "--- iw"
+	do_deldir ${android}/external/iw
+	do_deldir ${android}/.repo/projects/external/iw.git
+	sed -i "/system\/bin\/iw/d" ${android}/vendor/semc/mogami-common/mogami-common-vendor-blobs.mk
 else
 	sed -i "/br101/d" ${android}/.repo/local_manifests/xtended.xml
 fi
 
 #CMUpdater
-if [ "${updates}" != "Y" ]; then
+if [ "${updates}" = "Y" ]; then
+	echo "--- updates"
+	do_deldir ${android}/packages/apps/CMUpdater
+	do_deldir ${android}/.repo/projects/packages/apps/CMUpdater.git
+else
 	sed -i "/android_packages_apps_CMUpdater/d" ${android}/.repo/local_manifests/xtended.xml
 fi
 
-#Synchronize
+#Sync
 echo "*** Repo sync ***"
-if [ "${kernel}" = "Y" ]; then
-	cd ${android}/kernel/semc/msm7x30
-	do_clean M7630AABBQMLZA404033I-nAa-master
-	cd ${android}/bootable/recovery
-	do_clean
-	cd ${android}/device/semc/msm7x30-common
-	do_clean
-	cd ${android}/device/semc/mogami-common
-	do_clean
-	for device in ${devices}
-	do
-		cd ${android}/device/semc/${device}
-		do_clean
-	done
-else
-	cd ${android}
-	if [ "${init}" != "Y" ]; then
-		${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
-		if [ $? -ne 0 ] && [ "${buildbot}" != "Y" ]; then
-			exit
-		fi
-	fi
-	${repo} sync
-	if [ $? -ne 0 ]; then
+cd ${android}
+if [ "${init}" != "Y" ]; then
+	${repo} forall -c "git remote -v | head -n 1 | tr -d '\n' && echo -n ': ' && git reset --hard && git clean -df"
+	if [ $? -ne 0 ] && [ "${buildbot}" != "Y" ]; then
 		exit
 	fi
+fi
+${repo} sync
+if [ $? -ne 0 ]; then
+	exit
 fi
 
 #Linaro toolchain
@@ -335,47 +281,33 @@ if [ "${kernel_linaro}" = "Y" ]; then
 	fi
 fi
 
-if [ "${kernel}" != "Y" ]; then
-
-	#Prebuilts
-	if [ "${pdroid}" = "Y" ]; then
-		do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid2.0.apk -O -L https://github.com/CollegeDev/PDroid2.0_Manager_Compiled/raw/jellybean-devel/PDroid2.0.apk" ${android}/vendor/cm/get-prebuilts
-		do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid2.0.apk:system/app/PDroid2.0.apk" ${android}/vendor/cm/config/common.mk
-	fi
-
-	if [ "${updates}" = "Y" ]; then
-		do_append "curl -L -o ${android}/vendor/cm/proprietary/GooManager.apk -O -L https://github.com/solarnz/GooManager_prebuilt/blob/master/GooManager.apk?raw=true" ${android}/vendor/cm/get-prebuilts
-		do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/GooManager.apk:system/app/GooManager.apk" ${android}/vendor/cm/config/common.mk
-	fi
-
-	${android}/vendor/cm/get-prebuilts
-	if [ $? -ne 0 ]; then
-		exit
-	fi
-
-	#APN's CM10.1
-	if [ "${apn_cm10_1}" = "Y" ]; then
-		cd ${android}/vendor/cm/prebuilt/common/etc
-		wget -N https://raw.github.com/CyanogenMod/android_vendor_cm/cm-10.1/prebuilt/common/etc/apns-conf.xml
-	fi
-
-	#One core build
-	if [ "${onecorebuild}" = "Y" ]; then
-		echo "*** One core build"
-		cd ${android}/build
-		do_patch onecore.patch
-	fi
-
-	#--- merge requests ---
-
-	echo "*** Merge requests ***"
-	. ${patches}/merge_requests.sh
-
-	#http://review.cyanogenmod.org/#/c/36875/
-	cd ${android}/packages/apps/Mms
-	#git fetch http://review.cyanogenmod.org/CyanogenMod/android_packages_apps_Mms refs/changes/75/36875/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1
-	do_patch mms_cursor.patch
+#Prebuilts
+if [ "${pdroid}" = "Y" ]; then
+	do_append "curl -L -o ${android}/vendor/cm/proprietary/PDroid2.0.apk -O -L https://github.com/CollegeDev/PDroid2.0_Manager_Compiled/raw/jellybean-devel/PDroid2.0.apk" ${android}/vendor/cm/get-prebuilts
+	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/PDroid2.0.apk:system/app/PDroid2.0.apk" ${android}/vendor/cm/config/common.mk
 fi
+
+if [ "${updates}" = "Y" ]; then
+	do_append "curl -L -o ${android}/vendor/cm/proprietary/GooManager.apk -O -L https://github.com/solarnz/GooManager_prebuilt/blob/master/GooManager.apk?raw=true" ${android}/vendor/cm/get-prebuilts
+	do_append "PRODUCT_COPY_FILES += vendor/cm/proprietary/GooManager.apk:system/app/GooManager.apk" ${android}/vendor/cm/config/common.mk
+fi
+
+${android}/vendor/cm/get-prebuilts
+if [ $? -ne 0 ]; then
+	exit
+fi
+
+#One core build
+if [ "${onecorebuild}" = "Y" ]; then
+	echo "*** One core build"
+	cd ${android}/build
+	do_patch onecore.patch
+fi
+
+#--- merge requests ---
+
+echo "*** Merge requests ***"
+. ${patches}/merge_requests.sh
 
 #--- kernel ---
 
@@ -392,14 +324,6 @@ fi
 if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
-
-	do_patch kernel_logo.patch
-	do_patch kernel_no_wifi_uv.patch
-
-	if [ "${kernel_fixes}" = "Y" ]; then
-		echo "--- Warnings"
-		do_patch kernel_fixes.patch
-	fi
 
 	if [ "${kernel_clock}" = "Y" ]; then
 		echo "--- Clock"
@@ -423,29 +347,16 @@ if [ "${kernel_mods}" = "Y" ]; then
 		done
 	fi
 
-	if [ "${kernel_ti_st}" = "Y" ]; then
-		echo "--- ti st"
-		do_patch kernel_ti_st.patch
-		do_patch kernel_mogami_ti_st.patch
-		do_patch kernel_mogami_ti_st_suspend.patch
-		do_patch kernel_remove_rfkill.patch
-		do_patch kernel_uhid.patch
-	fi
-
 	if [ "${kernel_linaro}" = "Y" ]; then
 		echo "--- Linaro"
+		do_patch kernel_fixes.patch
 		do_patch kernel_linaro.patch
 	fi
 
-	if [ "${kernel_xtended_perm}" = "Y" ]; then
+	if [ "${kernel_xtended}" = "Y" ]; then
 		echo "--- Xtended permissions"
 		do_patch kernel_smartass_perm.patch
 		do_patch kernel_autogroup_perm.patch
-	fi
-
-	if [ "${fmradio}" = "Y" ]; then
-		echo "--- FM radio"
-		do_patch kernel_fmradio.patch
 	fi
 
 	if [ "${kernel_readahead}" = "Y" ]; then
@@ -461,7 +372,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "CONFIG_MSM_UNDERVOLT_WIFI=y" "# CONFIG_MSM_UNDERVOLT_WIFI is not set" arch/arm/configs/nAa_${device}_defconfig
 
 			if [ "${kernel_otg}" = "Y" ]; then
 				do_replace "# CONFIG_USB_OTG is not set" "CONFIG_USB_OTG=y" arch/arm/configs/nAa_${device}_defconfig
@@ -477,21 +387,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 			if [ "${kernel_linaro}" = "Y" ]; then
 				do_replace "CONFIG_ARM_UNWIND=y" "# CONFIG_ARM_UNWIND is not set" arch/arm/configs/nAa_${device}_defconfig
-			fi
-
-			if [ "${kernel_ti_st}" = "Y" ]; then
-				do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig
-				do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
-				do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
-				do_append "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
-			fi
-
-			if [ "${fmradio}" = "Y" ]; then
-				do_replace "# CONFIG_RADIO_WL128X is not set" "CONFIG_RADIO_WL128X=y" arch/arm/configs/nAa_${device}_defconfig
-
-				#do_replace "# CONFIG_SOUND_PRIME is not set" "CONFIG_SOUND_PRIME=y" arch/arm/configs/nAa_${device}_defconfig
-				#Doesn't work (source not compiled)
-				#do_append "CONFIG_SND_SOC_WL1273=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		else
 			echo "--- No kernel config for ${device}"
@@ -517,19 +412,10 @@ if [ "${pin}" = "Y" ]; then
 	done
 fi
 
-if [ "${sideload}" = "Y" ]; then
-	echo "*** CWM sideload cancel"
-	cd ${android}/bootable/recovery
-	do_patch recovery_sideload.patch
-fi
-
 #--- Device ---
 
 #Legacy camera
 #do_replace "#BOARD_USES_LEGACY_CAMERA := true" "BOARD_USES_LEGACY_CAMERA := true" ${android}/device/semc/msm7x30-common/BoardConfigCommon.mk
-
-#BT log spam
-do_replace "ALOGI(\"vendor op - %d\", opcode);" "\/\/ALOGI(\"vendor op - %d\", opcode);" ${android}/hardware/ti/wpan/bluedroid_wilink/libbt-vendor-ti.c
 
 #Boot logo
 if [ "${bootlogo}" = "Y" ]; then
@@ -571,126 +457,102 @@ if [ "${updates}" = "Y" ]; then
 	do_append "    ro.goo.version=\$(shell date +%s)" ${android}/device/semc/msm7x30-common/msm7x30.mk
 fi
 
-#FM radio
-if [ "${fmradio}" = "Y" ]; then
-	echo "*** FM radio ***"
-	cd ~/Downloads
-	if [ ! -d proprietary-open ]; then
-		git clone git://git.omapzoom.org/device/ti/proprietary-open.git
-	fi
-	cd proprietary-open
-	git checkout jb-release
-	git pull
-	cd ~/Downloads
-	tar -zxvf ~/Downloads/proprietary-open/wl12xx/wpan.tgz
-	cd ~/Downloads/wpan/fmradio
-	for bts in *1273*.bts; do
-		echo "--- ${bts}"
-		cp ${bts} ${android}/device/semc/mogami-common/prebuilt/${bts}
-		do_append "PRODUCT_COPY_FILES += device/semc/mogami-common/prebuilt/${bts}:root/firmware/${bts}" ${android}/device/semc/mogami-common/mogami.mk
-	done
-fi
-
 #--- ROM ---
 
-if [ "${kernel}" != "Y" ]; then
+#MMS fix
+if [ "${mms_fix}" = "Y" ]; then
+	cd ${android}/packages/apps/Mms
+	do_patch mms_cursor.patch
+fi
 
-	#Cell broadcast
-	if [ "${cellbroadcast}" = "Y" ]; then
-		echo "*** Cell broadcast ***"
-		do_append "PRODUCT_PACKAGES += CellBroadcastReceiver" ${android}/build/target/product/core.mk
-		cd ${android}/device/semc/mogami-common
-		do_patch cb_settings.patch
+#Cell broadcast
+if [ "${cellbroadcast}" = "Y" ]; then
+	echo "*** Cell broadcast ***"
+	do_append "PRODUCT_PACKAGES += CellBroadcastReceiver" ${android}/build/target/product/core.mk
+	cd ${android}/device/semc/mogami-common
+	do_patch cb_settings.patch
+fi
+
+#PDroid
+if [ "${pdroid}" = "Y" ]; then
+	echo "*** PDroid 1.57 ***"
+
+	cd ${android}
+	pdroidurl=https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1
+	wget -O - ${pdroidurl}/CM10.1_Mms.patch | patch -p1
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	wget -O - ${pdroidurl}/CM10.1_PDAgent.patch | patch -p1
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	wget -O - ${pdroidurl}/CM10.1_build.patch | patch -p1
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	wget -O - ${pdroidurl}/CM10.1_framework.patch | patch -p1
+	if [ $? -ne 0 ]; then
+		exit
+	fi
+	wget -O - ${pdroidurl}/CM10.1_libcore.patch | patch -p1
+	if [ $? -ne 0 ]; then
+		exit
 	fi
 
-	#PDroid
-	if [ "${pdroid}" = "Y" ]; then
-		echo "*** PDroid 1.57 ***"
+	do_copy ${patches}/PDroid.jpeg ${android}/privacy
+	do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
+fi
 
-		cd ${android}
-		pdroidurl=https://raw.github.com/CollegeDev/PDroid2.0_Framework_Patches/cm10.1
-		wget -O - ${pdroidurl}/CM10.1_Mms.patch | patch -p1
+#terminfo
+if [ "${terminfo}" = "Y" ]; then
+	echo "*** Terminfo ***"
+	terminfo_dl=~/Downloads/termtypes.master.gz
+	if [ ! -f "${terminfo_dl}" ]; then
+		wget -O ${terminfo_dl} http://catb.org/terminfo/termtypes.master.gz
 		if [ $? -ne 0 ]; then
 			exit
 		fi
-		wget -O - ${pdroidurl}/CM10.1_PDAgent.patch | patch -p1
-		if [ $? -ne 0 ]; then
-			exit
-		fi
-		wget -O - ${pdroidurl}/CM10.1_build.patch | patch -p1
-		if [ $? -ne 0 ]; then
-			exit
-		fi
-		wget -O - ${pdroidurl}/CM10.1_framework.patch | patch -p1
-		if [ $? -ne 0 ]; then
-			exit
-		fi
-		wget -O - ${pdroidurl}/CM10.1_libcore.patch | patch -p1
-		if [ $? -ne 0 ]; then
-			exit
-		fi
-
-		do_copy ${patches}/PDroid.jpeg ${android}/privacy
-		do_append "PRODUCT_COPY_FILES += privacy/PDroid.jpeg:system/media/PDroid.jpeg" ${android}/vendor/cm/config/common.mk
 	fi
 
-	#terminfo
-	if [ "${terminfo}" = "Y" ]; then
-		echo "*** Terminfo ***"
-		terminfo_dl=~/Downloads/termtypes.master.gz
-		if [ ! -f "${terminfo_dl}" ]; then
-			wget -O ${terminfo_dl} http://catb.org/terminfo/termtypes.master.gz
-			if [ $? -ne 0 ]; then
-				exit
-			fi
-		fi
-
-		echo "--- Extracting"
-		gunzip <${terminfo_dl} >${tmp}/termtypes.master
-		echo "--- Converting"
-		tic -o ${android}/vendor/cm/prebuilt/common/etc/terminfo/ ${tmp}/termtypes.master
-		if [ $? -ne 0 ]; then
-			exit
-		fi
-		echo "--- Installing"
-		do_append "PRODUCT_COPY_FILES += \\" ${android}/vendor/cm/config/common.mk
-		cd ${android}/vendor/cm/prebuilt/common
-		find etc/terminfo -type f -exec echo "    vendor/cm/prebuilt/common/{}:system/{} \\" >>${android}/vendor/cm/config/common.mk \;
-
-		cd ${android}/vendor/cm/prebuilt/common/etc
-		do_patch mkshrc.patch
+	echo "--- Extracting"
+	gunzip <${terminfo_dl} >${tmp}/termtypes.master
+	echo "--- Converting"
+	tic -o ${android}/vendor/cm/prebuilt/common/etc/terminfo/ ${tmp}/termtypes.master
+	if [ $? -ne 0 ]; then
+		exit
 	fi
+	echo "--- Installing"
+	do_append "PRODUCT_COPY_FILES += \\" ${android}/vendor/cm/config/common.mk
+	cd ${android}/vendor/cm/prebuilt/common
+	find etc/terminfo -type f -exec echo "    vendor/cm/prebuilt/common/{}:system/{} \\" >>${android}/vendor/cm/config/common.mk \;
 
-	#Mass storage
-	if [ "${massstorage}" = "Y" ]; then
-		echo "*** Mass storage ***"
-		cd ${android}/device/semc/msm7x30-common
-		do_patch mass_storage.patch
-	fi
+	cd ${android}/vendor/cm/prebuilt/common/etc
+	do_patch mkshrc.patch
+fi
 
-	#Xtended settings
-	if [ "${xsettings}" = "Y" ]; then
-		echo "*** Xtended settings ***"
-		cd ${android}/packages/apps/Settings
-		do_patch xsettings.patch
-		cd ${android}/device/semc/mogami-common
-		do_patch mogami_xtended.patch
-	fi
+#Mass storage
+if [ "${massstorage}" = "Y" ]; then
+	echo "*** Mass storage ***"
+	cd ${android}/device/semc/msm7x30-common
+	do_patch mass_storage.patch
+fi
 
-	#ssh
-	if [ "${ssh}" = "Y" ]; then
-		echo "*** sftp-server ***"
-		cd ${android}/external/openssh
-		do_patch sftp-server.patch
-		#needs extra 'mmm external/openssh'
-	fi
+#Xtended settings
+if [ "${xsettings}" = "Y" ]; then
+	echo "*** Xtended settings ***"
+	cd ${android}/packages/apps/Settings
+	do_patch xsettings.patch
+	cd ${android}/device/semc/mogami-common
+	do_patch mogami_xtended.patch
+fi
 
-	#iw
-	if [ "${iw}" = "Y" ]; then
-		echo "*** iw ***"
-		cd ${android}/vendor/semc/mogami-common
-		do_patch mogami_iw.patch
-	fi
+#ssh
+if [ "${ssh}" = "Y" ]; then
+	echo "*** sftp-server ***"
+	cd ${android}/external/openssh
+	do_patch sftp-server.patch
+	#needs extra 'mmm external/openssh'
 fi
 
 #Custom patches
