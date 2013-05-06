@@ -38,7 +38,6 @@ devices="coconut iyokan mango smultron"
 hdmi="haida hallon iyokan"
 init=N
 updates=N
-onecorebuild=N
 debug=N
 
 if [ "$1" = "init" ]; then
@@ -75,7 +74,6 @@ pdroid=Y
 terminfo=Y
 xsettings=Y
 ssh=Y
-boost_pulse=Y
 
 #Local configuration
 if [ -f ~/.cm101xtended ]; then
@@ -282,13 +280,6 @@ if [ $? -ne 0 ]; then
 	exit
 fi
 
-#One core build
-if [ "${onecorebuild}" = "Y" ]; then
-	echo "*** One core build"
-	cd ${android}/build
-	do_patch onecore.patch
-fi
-
 #--- merge requests ---
 
 echo "*** Merge requests ***"
@@ -424,13 +415,6 @@ if [ "${bootlogo}" = "Y" ]; then
 		fi
 	fi
 	${tmp}/to565 -rle <${tmp}/logo_M_new.raw >${android}/device/semc/msm7x30-common/prebuilt/logo_M.rle
-fi
-
-#Smartass boost pulse
-if [ "${boost_pulse}" = "Y" ]; then
-	echo "*** Enable Smartass boost pulse ***"
-	cd ${android}/device/semc/msm7x30-common
-	do_patch power_boost_pulse.patch
 fi
 
 #goo.im
