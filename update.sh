@@ -55,6 +55,7 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 
 kernel_mods=Y
 kernel_linaro=Y
+kernel_clock=Y
 kernel_hdmi=Y
 kernel_otg=N
 kernel_usb_tether=Y
@@ -300,6 +301,11 @@ fi
 if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
+
+	if [ "${kernel_clock}" = "Y" ]; then
+		echo "--- Clock"
+		do_patch kernel_clock.patch
+	fi
 
 	if [ "${kernel_hdmi}" = "Y" ]; then
 		echo "--- HDMI"
