@@ -215,7 +215,7 @@ lmanifests=${android}/.repo/local_manifests
 mkdir -p ${lmanifests}
 curl https://raw.github.com/semc7x30/local_manifests/master/semc.xml >${lmanifests}/semc.xml
 rm -f ${lmanifests}/cmxtended.xml	#legacy
-rm -f ${lmanifests}/xtended.xml		#legacy
+do_copy ${patches}/xtended.xml ${lmanifests}/xtended.xml
 
 #CMUpdater
 if [ "${updates}" = "Y" ]; then
