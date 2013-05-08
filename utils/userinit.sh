@@ -12,21 +12,26 @@ echo "ro.ril.def.agps.mode=0" >>/system/build.prop
 echo "ro.ril.def.agps.feature=1" >>/system/build.prop
 log -p i -t userinit.sh "Disabled aGPS"
 
-#Disable button backlights
-sed -i 's/echo 4000 > $dev\/button-backlight\/max_current/echo 1 >> $dev\/button-backlight\/max_current/g' /etc/hw_config.sh
-log -p i -t userinit.sh "Disabled button backlights"
-
 #Enable all alerts
 sed -i '/ro.cellbroadcast.emergencyids/d' /system/build.prop
 echo "ro.cellbroadcast.emergencyids=0-65534" >>/system/build.prop
 log -p i -t userinit.sh "Enabled all alerts"
 
+#Enable pie control
+sed -i '/qemu.hw.mainkeys/d' /system/build.prop
+echo "qemu.hw.mainkeys=0" >>/system/build.prop
+log -p i -t userinit.sh "Enabled pie control"
+
 mount -o remount,ro /system
+
+#Disable button backlights
+sleep 60 && echo 1 > /sys/devices/i2c-0/0-0040/leds/button-backlight/max_current &
+log -p i -t userinit.sh "Disabling button backlights"
 
 #Wifi scan interval
 setprop wifi.supplicant_scan_interval 180
 log -p i -t userinit.sh "Modified scan interval"
 
 #sshd
-/system/bin/sshd
-log -p i -t userinit.sh "Started sshd"
+#/system/bin/sshd
+#log -p i -t userinit.sh "Started sshd"
