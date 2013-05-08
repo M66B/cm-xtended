@@ -203,6 +203,9 @@ do
 	fi
 done
 
+rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_dec.h
+rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_enc.h
+
 #Initialize
 if [ "${init}" = "Y" ]; then
 	cd ${android}
