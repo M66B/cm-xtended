@@ -1,5 +1,4 @@
 #!/bin/bash
-#set -e
 
 echo "$0" | grep -q bash
 if [ $? -eq 0 ] || [ "${buildbot}" = "Y" ]; then
@@ -75,6 +74,7 @@ pdroid=Y
 terminfo=Y
 xsettings=Y
 ssh=Y
+fmtools=Y
 
 #Local configuration
 if [ -f ~/.cm101xtended ]; then
@@ -302,11 +302,13 @@ if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
 
+	#Underclock
 	if [ "${kernel_clock}" = "Y" ]; then
 		echo "--- Clock"
 		do_patch kernel_clock.patch
 	fi
 
+	#HDMI
 	if [ "${kernel_hdmi}" = "Y" ]; then
 		echo "--- HDMI"
 		do_patch kernel_hdmi_dependencies.patch
@@ -324,18 +326,21 @@ if [ "${kernel_mods}" = "Y" ]; then
 		done
 	fi
 
+	#Linaro
 	if [ "${kernel_linaro}" = "Y" ]; then
 		echo "--- Linaro"
 		do_patch kernel_fixes.patch
 		do_patch kernel_linaro.patch
 	fi
 
+	#Xtended
 	if [ "${kernel_xtended}" = "Y" ]; then
 		echo "--- Xtended permissions"
 		do_patch kernel_smartass_perm.patch
 		do_patch kernel_autogroup_perm.patch
 	fi
 
+	#readahead
 	if [ "${kernel_readahead}" = "Y" ]; then
 		echo "--- readahead"
 		do_patch kernel_readahead.patch
@@ -346,15 +351,20 @@ if [ "${kernel_mods}" = "Y" ]; then
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 			echo "--- Config ${device}"
 
+			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "# CONFIG_DEFAULT_SIO is not set" "CONFIG_DEFAULT_SIO=y" arch/arm/configs/nAa_${device}_defconfig
+			#do_replace "# CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2 is not set" "CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2=y" arch/arm/configs/nAa_${device}_defconfig
 
+			#OTG
 			if [ "${kernel_otg}" = "Y" ]; then
 				do_replace "# CONFIG_USB_OTG is not set" "CONFIG_USB_OTG=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_USB_OTG_WHITELIST is not set" "CONFIG_USB_OTG_WHITELIST=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 
+			#USB tether
 			if [ "${kernel_usb_tether}" = "Y" ]; then
 				do_replace "# CONFIG_MII is not set" "CONFIG_MII=y" arch/arm/configs/nAa_${device}_defconfig
 				do_replace "# CONFIG_USB_USBNET is not set" "CONFIG_USB_USBNET=y" arch/arm/configs/nAa_${device}_defconfig
@@ -362,6 +372,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 				do_append "CONFIG_USB_NET_RNDIS_HOST=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 
+			#Linaro
 			if [ "${kernel_linaro}" = "Y" ]; then
 				do_replace "CONFIG_ARM_UNWIND=y" "# CONFIG_ARM_UNWIND is not set" arch/arm/configs/nAa_${device}_defconfig
 			fi
@@ -508,6 +519,12 @@ if [ "${ssh}" = "Y" ]; then
 	cd ${android}/external/openssh
 	do_patch sftp-server.patch
 	#needs extra 'mmm external/openssh'
+fi
+
+#FM tools
+if [ "${fmtools}" = "Y" ]; then
+	echo "*** FM tools ***"
+	do_append "PRODUCT_PACKAGES += kfmapp FmTxApp" ${android}/device/semc/mogami-common/mogami.mk
 fi
 
 #Custom patches
