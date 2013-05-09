@@ -203,9 +203,6 @@ do
 	fi
 done
 
-rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_dec.h
-rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_enc.h
-
 #Initialize
 if [ "${init}" = "Y" ]; then
 	cd ${android}
@@ -239,6 +236,9 @@ ${repo} sync
 if [ $? -ne 0 ]; then
 	exit
 fi
+
+rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_dec.h
+rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_enc.h
 
 #Linaro toolchain
 if [ "${kernel_linaro}" = "Y" ]; then
