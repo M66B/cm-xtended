@@ -360,6 +360,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_DEFAULT_SIO is not set" "CONFIG_DEFAULT_SIO=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2 is not set" "CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "CONFIG_CIFS=y" "CONFIG_CIFS=m" arch/arm/configs/nAa_${device}_defconfig
 
 			#OTG
 			if [ "${kernel_otg}" = "Y" ]; then
