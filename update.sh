@@ -55,9 +55,9 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 kernel_mods=Y
 kernel_linaro=Y
 kernel_clock=Y
-kernel_hdmi=Y
+kernel_hdmi=N
 kernel_otg=N
-kernel_usb_tether=Y
+kernel_usb_tether=N
 kernel_xtended=Y
 kernel_readahead=N
 
@@ -73,7 +73,7 @@ mms_fix=Y
 pdroid=Y
 terminfo=Y
 xsettings=Y
-disable_elp=Y
+disable_elp=N
 ssh=Y
 fmtools=Y
 
