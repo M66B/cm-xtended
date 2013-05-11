@@ -429,6 +429,8 @@ fi
 #Legacy camera
 #do_replace "#BOARD_USES_LEGACY_CAMERA := true" "BOARD_USES_LEGACY_CAMERA := true" ${android}/device/semc/msm7x30-common/BoardConfigCommon.mk
 
+do_replace "#define BTHC_USERIAL_READ_MEM_SIZE (1024)" "#define BTHC_USERIAL_READ_MEM_SIZE (2048)" ${android}/external/bluetooth/bluedroid/hci/include/bt_hci_bdroid.h
+
 #Boot logo
 if [ "${bootlogo}" = "Y" ]; then
 	echo "*** Boot logo ***"
