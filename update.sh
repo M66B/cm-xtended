@@ -53,7 +53,7 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 #bootimage
 
 kernel_mods=Y
-kernel_linaro=Y
+kernel_linaro=N
 kernel_clock=Y
 kernel_hdmi=N
 kernel_otg=N
@@ -301,7 +301,7 @@ if [ "${kernel_linaro}" = "Y" ]; then
 	done
 fi
 
-#caf 3.0.8: M7630AABBQMLZA404033I
+#Modifications
 if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
@@ -355,11 +355,24 @@ if [ "${kernel_mods}" = "Y" ]; then
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 			echo "--- Config ${device}"
 
+			#BlueDroid
+			do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
+			do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
+			do_append "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
+			do_append "CONFIG_MOGAMI_BLUEDROID" arch/arm/configs/nAa_${device}_defconfig
+
+			#FM
+			do_replace "# CONFIG_RADIO_WL128X is not set" "CONFIG_RADIO_WL128X=y" arch/arm/configs/nAa_${device}_defconfig
+
+			#Undervolt
+			do_replace "CONFIG_MSM_UNDERVOLT_WIFI=y" "# CONFIG_MSM_UNDERVOLT_WIFI is not set" arch/arm/configs/nAa_${device}_defconfig
+
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_DEFAULT_SIO is not set" "CONFIG_DEFAULT_SIO=y" arch/arm/configs/nAa_${device}_defconfig
+			#do_replace "# CONFIG_DEFAULT_SIO is not set" "CONFIG_DEFAULT_SIO=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2 is not set" "CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "CONFIG_CIFS=y" "CONFIG_CIFS=m" arch/arm/configs/nAa_${device}_defconfig
 
