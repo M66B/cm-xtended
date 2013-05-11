@@ -54,12 +54,12 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 
 kernel_mods=Y
 kernel_linaro=N
-kernel_clock=Y
+kernel_clock=N
 kernel_hdmi=N
+kernel_xtended=N
+kernel_readahead=N
 kernel_otg=N
 kernel_usb_tether=N
-kernel_xtended=Y
-kernel_readahead=N
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
@@ -306,6 +306,13 @@ if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
 
+	#Linaro
+	if [ "${kernel_linaro}" = "Y" ]; then
+		echo "--- Linaro"
+		do_patch kernel_fixes.patch
+		do_patch kernel_linaro.patch
+	fi
+
 	#Underclock
 	if [ "${kernel_clock}" = "Y" ]; then
 		echo "--- Clock"
@@ -328,13 +335,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 				do_append "CONFIG_UIO_PDRV_GENIRQ=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 		done
-	fi
-
-	#Linaro
-	if [ "${kernel_linaro}" = "Y" ]; then
-		echo "--- Linaro"
-		do_patch kernel_fixes.patch
-		do_patch kernel_linaro.patch
 	fi
 
 	#Xtended
@@ -376,8 +376,8 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
+			#do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
+			#do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_DEFAULT_SIO is not set" "CONFIG_DEFAULT_SIO=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2 is not set" "CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "CONFIG_CIFS=y" "CONFIG_CIFS=m" arch/arm/configs/nAa_${device}_defconfig
