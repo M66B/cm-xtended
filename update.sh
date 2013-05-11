@@ -359,7 +359,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 			do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
 			do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
-			do_append "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "# CONFIG_UHID is not set" "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
 			do_append "CONFIG_MOGAMI_BLUEDROID" arch/arm/configs/nAa_${device}_defconfig
 
 			#FM
