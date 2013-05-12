@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
 	<!-- Replaces -->
-	<remove-project name="semc7x30/msm7x30-3.0.x-nAa" />
+	<remove-project name="semc7x30/msm7x30-3.4.x-nAa" />
 	<project name="M66B/msm7x30-3.4.x-nAa" path="kernel/semc/msm7x30" revision="M7630AABBQMLZA40901040-nAa-master" />
 </manifest>
