@@ -54,12 +54,11 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 
 kernel_mods=Y
 kernel_linaro=N
-kernel_clock=N
+kernel_clock=Y
 kernel_hdmi=N
-kernel_xtended=N
-kernel_readahead=N
-kernel_otg=N
-kernel_usb_tether=N
+kernel_xtended=Y
+kernel_otg=N			#Does not build
+kernel_usb_tether=Y
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
@@ -341,12 +340,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 		do_patch kernel_autogroup_perm.patch
 	fi
 
-	#readahead
-	if [ "${kernel_readahead}" = "Y" ]; then
-		echo "--- readahead"
-		do_patch kernel_readahead.patch
-	fi
-
 	for device in ${devices}
 	do
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
@@ -375,8 +368,8 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
-			#do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
-			#do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_DEFAULT_SIO is not set" "CONFIG_DEFAULT_SIO=y" arch/arm/configs/nAa_${device}_defconfig
 			#do_replace "# CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2 is not set" "CONFIG_CPU_FREQ_DEFAULT_GOV_SMARTASS2=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_CIFS is not set" "CONFIG_CIFS=m" arch/arm/configs/nAa_${device}_defconfig
