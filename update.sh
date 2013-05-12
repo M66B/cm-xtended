@@ -238,9 +238,6 @@ if [ $? -ne 0 ]; then
 	exit
 fi
 
-rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_dec.h
-rm ${android}/device/semc/msm7x30-common/include/linux/msm_vidc_enc.h
-
 #Linaro toolchain
 if [ "${kernel_linaro}" = "Y" ]; then
 	echo "*** Linaro toolchain: ${linaro_name} ***"
