@@ -358,6 +358,8 @@ if [ "${kernel_mods}" = "Y" ]; then
 			do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_UHID is not set" "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
 			do_append "CONFIG_MOGAMI_BLUEDROID=y" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "CONFIG_BT_HCIUART_H4=y" "# CONFIG_BT_HCIUART_H4 is not set" arch/arm/configs/nAa_${device}_defconfig
+			do_replace "CONFIG_BT_HCIUART_LL=y" "# CONFIG_BT_HCIUART_LL is not set" arch/arm/configs/nAa_${device}_defconfig
 
 			#FM
 			do_replace "# CONFIG_RADIO_WL128X is not set" "CONFIG_RADIO_WL128X=y" arch/arm/configs/nAa_${device}_defconfig
