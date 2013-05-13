@@ -75,6 +75,7 @@ xsettings=Y
 disable_elp=N
 ssh=Y
 fmtools=Y
+adhoc=N
 
 #Local configuration
 if [ -f ~/.cm101xtended ]; then
@@ -537,6 +538,14 @@ fi
 if [ "${fmtools}" = "Y" ]; then
 	echo "*** FM tools ***"
 	do_append "PRODUCT_PACKAGES += kfmapp FmTxApp" ${android}/device/semc/mogami-common/mogami.mk
+fi
+
+#Wi-Fi ad-hoc
+if [ "${adhoc}" = "Y" ];then
+	echo "*** Wi-Fi ad-hoc ***"
+	for device in ${devices}; do
+		sed -i '6 i WifiAdhoc = 1' ${android}device/semc/${device}/config/tiwlan.ini
+	done
 fi
 
 #Custom patches
