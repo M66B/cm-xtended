@@ -345,18 +345,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 			echo "--- Config ${device}"
 
-			#BlueDroid
-			do_append "CONFIG_BT_WILINK=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_TI_ST is not set" "CONFIG_TI_ST=y" arch/arm/configs/nAa_${device}_defconfig
-			do_append "CONFIG_ST_HCI=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_UHID is not set" "CONFIG_UHID=y" arch/arm/configs/nAa_${device}_defconfig
-			do_append "CONFIG_MOGAMI_BLUEDROID=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "CONFIG_BT_HCIUART_H4=y" "# CONFIG_BT_HCIUART_H4 is not set" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "CONFIG_BT_HCIUART_LL=y" "# CONFIG_BT_HCIUART_LL is not set" arch/arm/configs/nAa_${device}_defconfig
-
-			#FM
-			do_replace "# CONFIG_RADIO_WL128X is not set" "CONFIG_RADIO_WL128X=y" arch/arm/configs/nAa_${device}_defconfig
-
 			#Undervolt
 			do_replace "CONFIG_MSM_UNDERVOLT_WIFI=y" "# CONFIG_MSM_UNDERVOLT_WIFI is not set" arch/arm/configs/nAa_${device}_defconfig
 
