@@ -72,7 +72,6 @@ mms_fix=Y
 pdroid=Y
 terminfo=Y
 xsettings=Y
-disable_elp=N
 ssh=Y
 fmtools=Y
 adhoc=N
@@ -518,12 +517,6 @@ if [ "${xsettings}" = "Y" ]; then
 	do_patch xsettings.patch
 	cd ${android}/device/semc/mogami-common
 	do_patch mogami_xtended.patch
-fi
-
-if [ "${disable_elp}" = "Y" ]; then
-	echo "*** Disable ELP ***"
-	cd ${android}/device/semc/mogami-common
-	do_patch mogami_elp.patch
 fi
 
 #ssh
