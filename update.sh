@@ -348,12 +348,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 			#Undervolt
 			do_replace "CONFIG_MSM_UNDERVOLT_WIFI=y" "# CONFIG_MSM_UNDERVOLT_WIFI is not set" arch/arm/configs/nAa_${device}_defconfig
 
-			#Processor
-			do_append "CONFIG_CPU_FREQ_GOV_SMARTASS2=y" arch/arm/configs/nAa_${device}_defconfig
-			do_append "CONFIG_CPU_FREQ_GOV_SMARTASSH3=y" arch/arm/configs/nAa_${device}_defconfig
-			do_append "CONFIG_CPU_FREQ_VDD_LEVELS=y" arch/arm/configs/nAa_${device}_defconfig
-			do_append "CONFIG_IOSCHED_SIO=y" arch/arm/configs/nAa_${device}_defconfig
-
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
 			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
