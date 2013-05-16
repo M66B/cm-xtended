@@ -61,6 +61,7 @@ kernel_cleancache=Y
 kernel_hdmi=N
 kernel_otg=N			#Does not build
 kernel_usb_tether=Y
+kernel_elp=Y
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
@@ -288,14 +289,6 @@ fi
 echo "*** Merge requests ***"
 . ${patches}/merge_requests.sh
 
-#wl127x firmware 6.3.10.2.115
-wl127xfw=${android}/vendor/semc/mogami-common/proprietary/etc/firmware/ti-connectivity/wl127x-fw-5-sr.bin
-if [ ! -f ${wl127xfw} ]; then
-	echo "${wl127xfw} not found"
-	exit
-fi
-do_copy ${patches}/wl127x-fw-5-sr.bin.6.3.10.2.115 ${wl127xfw}
-
 #--- kernel ---
 
 #Linaro
@@ -350,6 +343,20 @@ if [ "${kernel_mods}" = "Y" ]; then
 		done
 	fi
 
+	#ELP
+	if [ "${kernel_elp}" = "Y" ]; then
+		do_patch kernel_elp.patch
+
+		#wl127x firmware 6.3.10.2.115
+		wl127xfw=${android}/vendor/semc/mogami-common/proprietary/etc/firmware/ti-connectivity/wl127x-fw-5-sr.bin
+		if [ ! -f ${wl127xfw} ]; then
+			echo "${wl127xfw} not found"
+			exit
+		fi
+		do_copy ${patches}/wl127x-fw-5-sr.bin.6.3.10.2.115 ${wl127xfw}
+	fi
+
+	#Config
 	for device in ${devices}
 	do
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
@@ -411,8 +418,6 @@ if [ "${pin}" = "Y" ]; then
 fi
 
 #--- Device ---
-
-do_replace "#define BTHC_USERIAL_READ_MEM_SIZE (1024)" "#define BTHC_USERIAL_READ_MEM_SIZE (2048)" ${android}/external/bluetooth/bluedroid/hci/include/bt_hci_bdroid.h
 
 #Boot logo
 if [ "${bootlogo}" = "Y" ]; then
