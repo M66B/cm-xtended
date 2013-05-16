@@ -315,8 +315,6 @@ if [ "${kernel_mods}" = "Y" ]; then
 		git cherry-pick --no-commit 435d60ac34cdc6b54a37fb2a7ab29b970f0ee642 #Inline building for compat-wireless
 		git cherry-pick --no-commit 7d4cc4f3cb7842fcc9948d7e6829c202884bcd77 #wl12xx: update header file
 		git cherry-pick --no-commit 3c93109c08c4355f32d0b67c4ccc36ab4fc288a0 #wl12xx and compat-wireless ol_R5.SP5.01 release
-		#CONFIG_WL_TI=y ?
-		#CONFIG_WILINK_PLATFORM_DATA=y ?
 		kernel_wl12xx_bp=N
 	fi
 
@@ -376,7 +374,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 			if [ "${kernel_ti_cw}" = "Y" ]; then
 				do_append "CONFIG_WL12XX_MENU=y" arch/arm/configs/nAa_${device}_defconfig
-				do_append "CONFIG_WL12XX_SDIO=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_WL12XX_SDIO=m" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_COMPAT_MAC80211_RC_DEFAULT=\"minstrel_ht\"" arch/arm/configs/nAa_${device}_defconfig
 			fi
 
