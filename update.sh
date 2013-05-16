@@ -61,7 +61,7 @@ kernel_cleancache=Y
 kernel_hdmi=N
 kernel_otg=N			#Does not build
 kernel_usb_tether=Y
-kernel_elp=Y
+kernel_elp=N
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
