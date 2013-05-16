@@ -62,7 +62,7 @@ kernel_hdmi=N
 kernel_otg=N			#Does not build
 kernel_usb_tether=Y
 kernel_wl12xx_bp=N
-kernel_ti_cw=Y
+kernel_ti_cw=N
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
