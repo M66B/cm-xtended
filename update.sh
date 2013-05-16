@@ -55,8 +55,10 @@ linaro_url=https://android-build.linaro.org/jenkins/view/Toolchain/job/linaro-an
 kernel_mods=Y
 kernel_linaro=N
 kernel_clock=Y
-kernel_hdmi=N
 kernel_xtended=Y
+kernel_autogroup=Y
+kernel_cleancache=Y
+kernel_hdmi=N
 kernel_otg=N			#Does not build
 kernel_usb_tether=Y
 
@@ -347,8 +349,14 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
-			if [ "${kernel_xtended}" = "Y" ]; then
+
+			#autogroup
+			if [ "${kernel_autogroup}" = "Y" ]; then
 				do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
+			fi
+
+			#cleancache
+			if [ "${kernel_cleancache}" = "Y" ]; then
 				do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
 			fi
 
