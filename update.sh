@@ -61,7 +61,8 @@ kernel_cleancache=Y
 kernel_hdmi=N
 kernel_otg=N			#Does not build
 kernel_usb_tether=Y
-kernel_elp=N
+kernel_wl12xx_bp=N
+kernel_ti_cw=Y
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
@@ -305,6 +306,20 @@ if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
 
+	#TI compat-wireless
+	if [ "${kernel_ti_cw}" = "Y" ]; then
+		git remote add wl https://github.com/nobodyAtall/msm7x30-3.4.x-nAa.git
+		git fetch wl
+		git revert --no-commit 006d345736dc0ea07c978d109a3ba33b980ffbfb #wl12xx: Move firmware location to system
+		git cherry-pick --no-commit 3441d2d617b734545a1a830398f6dee011d9453b #Remove compat-drivers
+		git cherry-pick --no-commit 435d60ac34cdc6b54a37fb2a7ab29b970f0ee642 #Inline building for compat-wireless
+		git cherry-pick --no-commit 7d4cc4f3cb7842fcc9948d7e6829c202884bcd77 #wl12xx: update header file
+		git cherry-pick --no-commit 3c93109c08c4355f32d0b67c4ccc36ab4fc288a0 #wl12xx and compat-wireless ol_R5.SP5.01 release
+		#CONFIG_WL_TI=y ?
+		#CONFIG_WILINK_PLATFORM_DATA=y ?
+		kernel_wl12xx_bp=N
+	fi
+
 	#Linaro
 	if [ "${kernel_linaro}" = "Y" ]; then
 		echo "--- Linaro"
@@ -344,7 +359,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 	fi
 
 	#ELP
-	if [ "${kernel_elp}" = "Y" ]; then
+	if [ "${kernel_wl12xx_bp}" = "Y" ]; then
 		do_patch kernel_wl12xx_fw.patch
 		do_patch kernel_wl12xx_backport-3.10.patch
 
@@ -358,6 +373,12 @@ if [ "${kernel_mods}" = "Y" ]; then
 	do
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 			echo "--- Config ${device}"
+
+			if [ "${kernel_ti_cw}" = "Y" ]; then
+				do_append "CONFIG_WL12XX_MENU=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_WL12XX_SDIO=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_COMPAT_MAC80211_RC_DEFAULT=\"minstrel_ht\"" arch/arm/configs/nAa_${device}_defconfig
+			fi
 
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
