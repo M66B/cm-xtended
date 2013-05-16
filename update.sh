@@ -315,6 +315,13 @@ if [ "${kernel_mods}" = "Y" ]; then
 		do_patch kernel_clock.patch
 	fi
 
+	#Xtended
+	if [ "${kernel_xtended}" = "Y" ]; then
+		echo "--- Xtended permissions"
+		do_patch kernel_smartass_perm.patch
+		do_patch kernel_autogroup_perm.patch
+	fi
+
 	#HDMI
 	if [ "${kernel_hdmi}" = "Y" ]; then
 		echo "--- HDMI"
@@ -333,25 +340,17 @@ if [ "${kernel_mods}" = "Y" ]; then
 		done
 	fi
 
-	#Xtended
-	if [ "${kernel_xtended}" = "Y" ]; then
-		echo "--- Xtended permissions"
-		do_patch kernel_smartass_perm.patch
-		do_patch kernel_autogroup_perm.patch
-	fi
-
 	for device in ${devices}
 	do
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 			echo "--- Config ${device}"
 
-			#Undervolt
-			do_replace "CONFIG_MSM_UNDERVOLT_WIFI=y" "# CONFIG_MSM_UNDERVOLT_WIFI is not set" arch/arm/configs/nAa_${device}_defconfig
-
 			#Xtended
 			do_replace "CONFIG_LOCALVERSION=\"-nAa" "CONFIG_LOCALVERSION=\"-nAa-Xtd" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
-			do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
+			if [ "${kernel_xtended}" = "Y" ]; then
+				do_replace "# CONFIG_SCHED_AUTOGROUP is not set" "CONFIG_SCHED_AUTOGROUP=y" arch/arm/configs/nAa_${device}_defconfig
+				do_replace "# CONFIG_CLEANCACHE is not set" "CONFIG_CLEANCACHE=y" arch/arm/configs/nAa_${device}_defconfig
+			fi
 
 			#OTG
 			if [ "${kernel_otg}" = "Y" ]; then
