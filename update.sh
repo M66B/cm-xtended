@@ -288,6 +288,14 @@ fi
 echo "*** Merge requests ***"
 . ${patches}/merge_requests.sh
 
+#wl127x firmware 6.3.10.2.115
+wl127xfw=${android}/vendor/semc/mogami-common/proprietary/etc/firmware/ti-connectivity/wl127x-fw-5-sr.bin
+if [ ! -f ${wl127xfw} ]; then
+	echo "${wl127xfw} not found"
+	exit
+fi
+do_copy ${patches}/wl127x-fw-5-sr.bin.6.3.10.2.115 ${wl127xfw}
+
 #--- kernel ---
 
 #Linaro
