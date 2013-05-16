@@ -345,7 +345,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 	#ELP
 	if [ "${kernel_elp}" = "Y" ]; then
-		do_patch kernel_fw.patch
+		do_patch kernel_wl12xx_fw.patch
 		do_patch kernel_wl12xx_backport-3.10.patch
 
 		#wl127x firmware
