@@ -346,14 +346,10 @@ if [ "${kernel_mods}" = "Y" ]; then
 	#ELP
 	if [ "${kernel_elp}" = "Y" ]; then
 		do_patch kernel_fw.patch
-		do_patch kernel_elp.patch
+		do_patch kernel_wl12xx_backport-3.10.patch
 
-		#wl127x firmware 6.3.10.0.136
+		#wl127x firmware
 		wl127xfw=${android}/vendor/semc/mogami-common/proprietary/etc/firmware/ti-connectivity/wl127x-fw-5-sr.bin
-		if [ ! -f ${wl127xfw} ]; then
-			echo "${wl127xfw} not found"
-			exit
-		fi
 		do_copy ${patches}/wl127x-fw-4-sr.bin.6.3.10.0.136 ${wl127xfw}
 	fi
 
