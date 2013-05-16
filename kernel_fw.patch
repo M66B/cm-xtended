@@ -1,0 +1,17 @@
+diff --git a/net/compat-drivers/drivers/net/wireless/ti/wl12xx/main.c b/net/compat-drivers/drivers/net/wireless/ti/wl12xx/main.c
+index 2ba4e81..9d67143 100644
+--- a/net/compat-drivers/drivers/net/wireless/ti/wl12xx/main.c
++++ b/net/compat-drivers/drivers/net/wireless/ti/wl12xx/main.c
+@@ -599,9 +599,9 @@ static const int wl12xx_rtable[REG_TABLE_LEN] = {
+ };
+ 
+ /* TODO: maybe move to a new header file? */
+-#define WL127X_FW_NAME_MULTI	"ti-connectivity/wl127x-fw-5-mr.bin"
+-#define WL127X_FW_NAME_SINGLE	"ti-connectivity/wl127x-fw-5-sr.bin"
+-#define WL127X_PLT_FW_NAME	"ti-connectivity/wl127x-fw-5-plt.bin"
++#define WL127X_FW_NAME_MULTI	"../../../firmware/ti-connectivity/wl127x-fw-5-mr.bin"
++#define WL127X_FW_NAME_SINGLE	"../../../firmware/ti-connectivity/wl127x-fw-5-sr.bin"
++#define WL127X_PLT_FW_NAME	"../../../firmware/ti-connectivity/wl127x-fw-5-plt.bin"
+ 
+ #define WL128X_FW_NAME_MULTI	"ti-connectivity/wl128x-fw-5-mr.bin"
+ #define WL128X_FW_NAME_SINGLE	"ti-connectivity/wl128x-fw-5-sr.bin"
