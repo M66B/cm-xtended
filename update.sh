@@ -358,6 +358,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 
 	#ELP
 	do_patch kernel_wl12xx_fw.patch
+	do_patch kernel_mmc.patch
 	if [ "${kernel_wl12xx_bp}" = "Y" ]; then
 		do_patch kernel_wl12xx_backport-3.10.patch
 
