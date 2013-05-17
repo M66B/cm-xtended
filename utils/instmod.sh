@@ -32,6 +32,7 @@ for mod in $mods; do
 done
 
 adb shell su -c 'cp /data/local/tmp/*.ko /system/lib/modules/'
+adb shell su -c 'cd /system/lib/modules && ln -s wl12xx_sdio.ko wlcore_sdio.ko'
 
 echo "System read only"
 adb shell su -c 'mount -o remount,ro /system'
