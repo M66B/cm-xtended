@@ -62,7 +62,7 @@ kernel_hdmi=N
 kernel_otg=N			#Does not build
 kernel_usb_tether=Y
 kernel_wl12xx_bp=N
-kernel_ti_cw=N
+kernel_ti_cw=Y
 
 bootlogo=Y
 bootlogoh=logo_H_extended.png
@@ -191,8 +191,7 @@ do_deldir ${android}/out/target/common/obj/JAVA_LIBRARIES/framework2_intermediat
 do_deldir ${android}/out/target/common/obj/APPS/TelephonyProvider_intermediates
 do_deldir ${android}/packages/apps/PDroidAgent
 
-for device in ${devices}
-do
+for device in ${devices}; do
 	#kernel
 	do_deldir ${android}/out/target/product/${device}/obj/KERNEL_OBJ/
 	if [ -d "${android}/out/target/product/${device}" ]; then
@@ -295,8 +294,7 @@ echo "*** Merge requests ***"
 #Linaro
 if [ "${kernel_linaro}" = "Y" ]; then
 	echo "*** Kernel Linaro toolchain"
-	for device in ${devices}
-	do
+	for device in ${devices}; do
 		do_replace "arm-eabi-4.4.3" "${linaro_name}" ${android}/device/semc/${device}/BoardConfig.mk
 	done
 fi
@@ -306,8 +304,9 @@ if [ "${kernel_mods}" = "Y" ]; then
 	echo "*** Kernel ***"
 	cd ${android}/kernel/semc/msm7x30/
 
-	#TI compat-wireless
+	#compat-wireless
 	if [ "${kernel_ti_cw}" = "Y" ]; then
+		echo "--- TI compat-wireless"
 		git remote add wl https://github.com/nobodyAtall/msm7x30-3.4.x-nAa.git
 		git fetch wl
 		git revert --no-commit 006d345736dc0ea07c978d109a3ba33b980ffbfb #wl12xx: Move firmware location to system
@@ -315,7 +314,21 @@ if [ "${kernel_mods}" = "Y" ]; then
 		git cherry-pick --no-commit 435d60ac34cdc6b54a37fb2a7ab29b970f0ee642 #Inline building for compat-wireless
 		git cherry-pick --no-commit 7d4cc4f3cb7842fcc9948d7e6829c202884bcd77 #wl12xx: update header file
 		git cherry-pick --no-commit 3c93109c08c4355f32d0b67c4ccc36ab4fc288a0 #wl12xx and compat-wireless ol_R5.SP5.01 release
-		kernel_wl12xx_bp=N
+		for device in ${devices}; do
+			if [ -f ${android}/out/target/product/${device} ]; then
+				mkdir -p ${android}/out/target/product/${device}/root/firmware
+				do_copy ${patches}/wl127x-fw-4-sr.bin.6.3.10.0.136 ${android}/out/target/product/${device}/root/firmware/wl127x-fw-4-sr.bin
+			fi
+		done
+	else
+		do_patch kernel_wl12xx_fw.patch
+		if [ "${kernel_wl12xx_bp}" = "Y" ]; then
+			echo "--- 3.10 compat-wireless"
+			do_patch kernel_wl12xx_backport-3.10.patch
+		fi
+		#wl127x firmware
+		#wl127xfw=${android}/vendor/semc/mogami-common/proprietary/etc/firmware/ti-connectivity/wl127x-fw-5-sr.bin
+		#do_copy ${patches}/wl127x-fw-4-sr.bin.6.3.10.0.136 ${wl127xfw}
 	fi
 
 	#Linaro
@@ -342,8 +355,7 @@ if [ "${kernel_mods}" = "Y" ]; then
 	if [ "${kernel_hdmi}" = "Y" ]; then
 		echo "--- HDMI"
 		do_patch kernel_hdmi_dependencies.patch
-		for device in ${hdmi}
-		do
+		for device in ${hdmi}; do
 			if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 				echo "--- HDMI ${device}"
 				do_replace "# CONFIG_FB_MSM_DTV is not set" "CONFIG_FB_MSM_DTV=y" arch/arm/configs/nAa_${device}_defconfig
@@ -356,26 +368,15 @@ if [ "${kernel_mods}" = "Y" ]; then
 		done
 	fi
 
-	#ELP
-	do_patch kernel_wl12xx_fw.patch
-	do_patch kernel_mmc.patch
-	if [ "${kernel_wl12xx_bp}" = "Y" ]; then
-		do_patch kernel_wl12xx_backport-3.10.patch
-
-		#wl127x firmware
-		wl127xfw=${android}/vendor/semc/mogami-common/proprietary/etc/firmware/ti-connectivity/wl127x-fw-5-sr.bin
-		do_copy ${patches}/wl127x-fw-4-sr.bin.6.3.10.0.136 ${wl127xfw}
-	fi
-
 	#Config
-	for device in ${devices}
-	do
+	for device in ${devices}; do
 		if [ -f arch/arm/configs/nAa_${device}_defconfig ]; then
 			echo "--- Config ${device}"
 
 			if [ "${kernel_ti_cw}" = "Y" ]; then
-				do_append "CONFIG_WL12XX_MENU=y" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_WL12XX_MENU=m" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_WL12XX_SDIO=m" arch/arm/configs/nAa_${device}_defconfig
+				do_append "CONFIG_WL12XX_PLATFORM_DATA=y" arch/arm/configs/nAa_${device}_defconfig
 				do_append "CONFIG_COMPAT_MAC80211_RC_DEFAULT=\"minstrel_ht\"" arch/arm/configs/nAa_${device}_defconfig
 			fi
 
@@ -427,8 +428,7 @@ if [ "${pin}" = "Y" ]; then
 	do_patch msm7x30_check_pin.patch
 	cd ${android}/device/semc/mogami-common
 	do_patch mogami_check_pin.patch
-	for device in ${devices}
-	do
+	for device in ${devices}; do
 		initrc=${android}/device/semc/${device}/recovery/init.rc
 		do_replace "    restart adbd" "    #restart adbd" ${initrc}
 	done
