@@ -216,7 +216,7 @@ fi
 echo "*** Local manifest ***"
 lmanifests=${android}/.repo/local_manifests
 mkdir -p ${lmanifests}
-curl https://raw.github.com/semc7x30/local_manifests/master/semc.xml >${lmanifests}/semc.xml
+curl https://raw.github.com/LegacyXperia/local_manifests/master/semc.xml >${lmanifests}/semc.xml
 rm -f ${lmanifests}/cmxtended.xml	#legacy
 do_copy ${patches}/xtended.xml ${lmanifests}/xtended.xml
 
@@ -448,7 +448,7 @@ if [ "${bootlogo}" = "Y" ]; then
 			exit
 		fi
 	fi
-	${tmp}/to565 -rle <${tmp}/logo_H_new.raw >${android}/device/semc/msm7x30-common/prebuilt/logo_H.rle
+	${tmp}/to565 -rle <${tmp}/logo_H_new.raw >${android}/device/semc/msm7x30-common/bootlogo/480x854.rle
 
 	if [ ! -f ${tmp}/logo_M_new.raw ]; then
 		convert -depth 8 ${patches}/bootlogo/${bootlogom} -fill grey -gravity south -draw "text 0,10 '`date -R`'" rgb:${tmp}/logo_M_new.raw
@@ -457,7 +457,7 @@ if [ "${bootlogo}" = "Y" ]; then
 			exit
 		fi
 	fi
-	${tmp}/to565 -rle <${tmp}/logo_M_new.raw >${android}/device/semc/msm7x30-common/prebuilt/logo_M.rle
+	${tmp}/to565 -rle <${tmp}/logo_M_new.raw >${android}/device/semc/msm7x30-common/bootlogo/320x480.rle
 fi
 
 #goo.im
