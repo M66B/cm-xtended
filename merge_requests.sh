@@ -21,7 +21,7 @@ repo download packages/apps/LegacyCamera 28336/1
 #Add FM audio routing
 repo download hardware/qcom/audio-caf 34989/7
 
-#http://review.cyanogenmod.org/#/c/35964/
-#Allow brightness decrease when sensor value is zero
-cd ${android}/hardware/sony/DASH
-git fetch http://review.cyanogenmod.org/CyanogenMod/android_hardware_sony_DASH refs/changes/64/35964/1 && git format-patch -1 --stdout FETCH_HEAD | patch -p1 --reverse
+#http://review.cyanogenmod.org/#/c/38104/
+#Revert "Allow brightness decrease when sensor value is zero"
+#allows us to use again the lowest brightness with 0 lux
+repo download hardware/sony/DASH 38104/1
