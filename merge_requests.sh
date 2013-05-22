@@ -25,3 +25,7 @@ repo download hardware/qcom/audio-caf 34989/7
 #Revert "Allow brightness decrease when sensor value is zero"
 #allows us to use again the lowest brightness with 0 lux
 repo download hardware/sony/DASH 38104/1
+
+#http://review.cyanogenmod.org/#/c/38174/
+#init: Fix serial number on semc bootloaders
+repo download system/core 38174/1
