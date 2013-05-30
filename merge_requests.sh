@@ -11,11 +11,6 @@ cd ${android}
 #Fix camcorder
 repo download frameworks/av/ 32906/2
 
-#http://review.cyanogenmod.org/#/c/28336/
-#LegacyCamera: Load correct panorama JNI libs
-#Fix panorama FC in Legacy Camera
-repo download packages/apps/LegacyCamera 28336/1
-
 #http://review.cyanogenmod.org/#/c/34989/
 #msm7x30: Add support for SEMC FM radio
 #Add FM audio routing
