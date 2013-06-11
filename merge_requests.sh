@@ -6,11 +6,6 @@ fi
 
 cd ${android}
 
-#http://review.cyanogenmod.org/#/c/32906/
-#libstagefright: support for disabling buffer metadata
-#Fix camcorder
-repo download frameworks/av/ 32906/2
-
 #http://review.cyanogenmod.org/#/c/34989/
 #msm7x30: Add support for SEMC FM radio
 #Add FM audio routing
