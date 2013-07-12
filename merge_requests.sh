@@ -14,3 +14,7 @@ repo download hardware/qcom/audio-caf 34989/7
 #http://review.cyanogenmod.org/#/c/38174/
 #init: Fix serial number on semc bootloaders
 repo download system/core 38174/1
+
+#http://review.cyanogenmod.org/#/c/45435/
+#Add power off mode in advanced menu
+repo download bootable/recovery 45435/1
